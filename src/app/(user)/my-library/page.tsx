@@ -13,6 +13,19 @@ const MyLibraryPage = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [tempPage, setTempPage] = useState(0);
 
+  const handleStartReading = async (bookId: string) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await axios.patch('/api/v1/user/library', 
+        { bookId, status: 'Currently Reading' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.success) fetchLibrary();
+    } catch (err) {
+      alert("Failed to start reading");
+    }
+  };
+
   const fetchLibrary = useCallback(async () => {
     try {
       setLoading(true);
@@ -99,11 +112,20 @@ const MyLibraryPage = () => {
           <h2 className="text-xl font-serif font-bold">Want to Read</h2>
           <Link href="/books" className="text-[#c19a6b] text-xs hover:underline">View All →</Link>
         </div>
-        <div className="flex gap-8 overflow-x-auto pb-6">
+        <div className="flex gap-8 overflow-x-auto pb-6 custom-scrollbar">
           {library.wantToRead.map((item: any) => (
-            <div key={item._id} className="w-36 flex-shrink-0 space-y-3">
+            <div key={item._id} className="w-36 flex-shrink-0 space-y-3 group">
               <div className="relative aspect-[3/4.5] rounded-lg overflow-hidden shadow-2xl border border-white/5">
                 <Image src={item.book.coverImage} alt="cover" fill className="object-cover" />
+                {/* হোভার করলে Start Reading বাটন আসবে */}
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
+                   <button 
+                     onClick={() => handleStartReading(item.book._id)}
+                     className="bg-[#c19a6b] text-black text-[9px] font-black py-2 px-3 rounded uppercase tracking-tighter"
+                   >
+                     Start Reading
+                   </button>
+                </div>
               </div>
               <div>
                 <h4 className="text-sm font-bold truncate">{item.book.title}</h4>
@@ -111,7 +133,7 @@ const MyLibraryPage = () => {
               </div>
             </div>
           ))}
-          <Link href="/books" className="w-36 aspect-[3/4.5] border-2 border-dashed border-white/10 rounded-lg flex flex-col items-center justify-center text-gray-600 hover:text-[#c19a6b] transition-all bg-white/5">
+         <Link href="/books" className="w-36 aspect-[3/4.5] border-2 border-dashed border-white/10 rounded-lg flex flex-col items-center justify-center text-gray-600 hover:text-[#c19a6b] transition-all bg-white/5">
             <Plus size={30} />
             <span className="text-[10px] font-bold mt-2 uppercase">Add Book</span>
           </Link>
