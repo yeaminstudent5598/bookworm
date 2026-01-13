@@ -1,31 +1,26 @@
-"use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { verifyToken } from "@/lib/jwt";
 
-export default function Home() {
-  const router = useRouter();
+export default async function RootPage() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("accessToken")?.value;
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+  if (!token) {
+    redirect("/login");
+  }
 
-    if (!token) {
-      router.push("/login"); // Login na thakle Login-e pathao
-    } else {
-      // Role onujayi specific page-e pathiye dao
-      if (role === "admin") {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/my-library");
-      }
-    }
-  }, [router]);
+  const decoded = verifyToken(token);
 
-  return (
-    <div className="h-screen flex items-center justify-center bg-[#fdfaf1]">
-      <div className="animate-bounce font-serif text-2xl text-[#5c4033]">
-        Opening your Library...
-      </div>
-    </div>
-  );
+  if (!decoded) {
+    redirect("/login");
+  }
+
+  if (decoded.role === "admin") {
+    redirect("/admin/dashboard");
+  } else {
+    redirect("/my-library");
+  }
+
+  return null; 
 }
