@@ -7,5 +7,7 @@ export interface IUser {
   photo: string; // Cloudinary URL
   role: TUserRole;
   isDeleted: boolean;
+  currentStreak: number;
+  lastReadingDate: string;
   preferences?: string[]; 
 }

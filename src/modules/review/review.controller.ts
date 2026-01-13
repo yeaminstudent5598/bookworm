@@ -2,46 +2,94 @@ import { NextResponse } from 'next/server';
 import { ReviewService } from './review.service';
 import { ReviewValidation } from './review.validation';
 import dbConnect from '@/lib/dbConnect';
+import { verifyToken } from '@/lib/jwt';
 
+// ১. রিভিউ তৈরি করা (User Role)
 const createReview = async (req: Request) => {
   try {
-    await dbConnect();
+    await dbConnect(); //
     const body = await req.json();
-    const validatedData = ReviewValidation.createReviewSchema.parse(body);
+    
+    // টোকেন থেকে ইউজার আইডি বের করা (Security Best Practice)
+    const authHeader = req.headers.get('authorization');
+    const token = authHeader?.split(' ')[1];
+    
+    if (!token) throw new Error("Unauthorized! Please login.");
+    
+    const decodedUser = verifyToken(token);
+    if (!decodedUser) throw new Error("Invalid session. Please login again.");
+
+    // বডিতে 'user' এবং 'book' কি-গুলো নিশ্চিত করা (Zod Match করার জন্য)
+    const reviewData = {
+      ...body,
+      user: decodedUser.id, // টোকেন থেকে আইডি নেওয়া হলো
+      book: body.bookId     // ফ্রন্টএন্ড থেকে আসা bookId কে book এ ম্যাপ করা হলো
+    };
+
+    // ভ্যালিডেশন
+    const validatedData = ReviewValidation.createReviewSchema.parse(reviewData);
     const result = await ReviewService.createReviewInDB(validatedData);
+    
     return NextResponse.json({ success: true, message: 'Review submitted for moderation!', data: result });
   } catch (err: any) {
-    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+    return NextResponse.json({ 
+      success: false, 
+      message: err.name === 'ZodError' ? "Validation failed: Comment must be 10+ characters" : err.message 
+    }, { status: 400 });
   }
 };
 
+// ২. সব রিভিউ দেখা (Admin Role Only)
 const getAllReviews = async (req: Request) => {
   try {
-    await dbConnect();
+    await dbConnect(); //
+    
+    // Admin Check
+    const authHeader = req.headers.get('authorization');
+    const token = authHeader?.split(' ')[1];
+    const decoded = verifyToken(token || "");
+
+    // 🚩 ডিবাগ করার জন্য এই লগটি আপনার টার্মিনালে চেক করুন
+    console.log("🛠️ Admin Access Request by Role:", decoded?.role);
+
+    if (!decoded || decoded.role !== 'admin') {
+      throw new Error("Access Denied! Admin permissions required.");
+    }
+
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status') || 'pending';
+    
     const result = await ReviewService.getAllReviewsFromDB(status);
+    
     return NextResponse.json({ success: true, data: result });
   } catch (err: any) {
-    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+    return NextResponse.json({ success: false, message: err.message }, { status: 401 });
   }
 };
 
-const updateReviewStatus = async (req: Request, id: string) => {
+const approveReview = async (req: Request, id: string) => {
   try {
     await dbConnect();
-    const body = await req.json(); // { status: 'approved' }
-    const result = await ReviewService.updateReviewStatusInDB(id, body.status);
-    return NextResponse.json({ success: true, message: `Review ${body.status}!`, data: result });
+    
+    const token = req.headers.get('authorization')?.split(' ')[1];
+    const decoded = verifyToken(token || "");
+    if (!decoded || decoded.role !== 'admin') throw new Error("Access Denied!");
+
+    const body = await req.json();
+    const result = await ReviewService.updateReviewStatusInDB(id, body.status || 'approved');
+    
+    return NextResponse.json({ success: true, message: `Review ${body.status || 'approved'}!`, data: result });
   } catch (err: any) {
     return NextResponse.json({ success: false, message: err.message }, { status: 400 });
   }
 };
 
+// ৪. রিভিউ ডিলিট করা (Admin Role Only)
 const deleteReview = async (id: string) => {
   try {
-    await dbConnect();
+    await dbConnect(); //
     await ReviewService.deleteReviewFromDB(id);
+    
     return NextResponse.json({ success: true, message: 'Review deleted permanently' });
   } catch (err: any) {
     return NextResponse.json({ success: false, message: err.message }, { status: 400 });
@@ -51,6 +99,6 @@ const deleteReview = async (id: string) => {
 export const ReviewController = { 
   createReview, 
   getAllReviews, 
-  updateReviewStatus, 
+  approveReview, 
   deleteReview 
 };

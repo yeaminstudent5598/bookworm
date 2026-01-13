@@ -6,7 +6,9 @@ const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true, select: false }, // Security fix
+    password: { type: String, required: true, select: false },
+    currentStreak: { type: Number, default: 0 },
+    lastReadingDate: { type: String, default: "" },
     photo: { type: String, required: true },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     isDeleted: { type: Boolean, default: false },

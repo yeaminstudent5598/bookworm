@@ -1,46 +1,103 @@
 import { Library } from '../library/library.model';
 import { Book } from '../book/book.model';
 import { User } from '../user/user.model';
+import { Review } from '../review/review.model';
+import { RecommendationService } from '../book/recommendation.service';
+import mongoose from 'mongoose';
 
 const getUserDashboardStatsFromDB = async (userId: string) => {
-  // ১. ইউজারের বেসিক ইনফো
-  const user = await User.findById(userId).select('name photo');
+  // ১. ইউজারের বেসিক ইনফো এবং স্ট্রিক আনা
+  const user = await User.findById(userId).select('name photo currentStreak');
 
-  // ২. লাইব্রেরি স্ট্যাটস (বইয়ের সংখ্যা ও প্রগ্রেস)
+  // ২. লাইব্রেরি সামারি: মোট পড়া বইয়ের সংখ্যা
   const booksFinished = await Library.countDocuments({ user: userId, status: 'Read' });
-  const currentlyReading = await Library.find({ user: userId, status: 'Currently Reading' }).populate('book');
   
-  // ৩. পেইজ রিড ক্যালকুলেশন (সিম্পল এগ্রিগেশন)
-  const totalProgress = await Library.aggregate([
-    { $match: { user: userId } },
-    { $group: { _id: null, total: { $sum: "$progress" } } }
+  // বর্তমানে পড়ছে এমন লেটেস্ট বই (Jump Back In সেকশনের জন্য)
+  const activeReading = await Library.findOne({ user: userId, status: 'Currently Reading' })
+    .populate('book')
+    .sort({ updatedAt: -1 });
+
+  // ৩. ডাইনামিক টোটাল পেইজ ক্যালকুলেশন (ObjectId Casting Fix)
+  const pageStats = await Library.aggregate([
+    { $match: { user: new mongoose.Types.ObjectId(userId) } },
+    { $group: { _id: null, total: { $sum: "$currentPage" } } }
   ]);
 
-  // ৪. রিডিং চ্যালেঞ্জ গোল (২০২৬ এর জন্য)
-  const challengeGoal = 50; // এটি আপনি চাইলে ইউজার মডেল থেকেও আনতে পারেন
+  // ৪. গ্রাফ ১: জেনার ব্রেকডাউন (Donut Chart)
+  const genreBreakdown = await Library.aggregate([
+    { $match: { user: new mongoose.Types.ObjectId(userId) } },
+    { $lookup: { from: 'books', localField: 'book', foreignField: '_id', as: 'bookInfo' } },
+    { $unwind: '$bookInfo' },
+    { $group: { _id: '$bookInfo.genre', count: { $sum: 1 } } },
+    { $lookup: { from: 'genres', localField: '_id', foreignField: '_id', as: 'genreInfo' } },
+    { $unwind: '$genreInfo' },
+    { $project: { name: '$genreInfo.name', value: '$count' } }
+  ]);
 
-  // ৫. রিকমেন্ডেশন (ইউজারের পছন্দের ওপর ভিত্তি করে বা র‍্যান্ডম কিছু বই)
-  const recommendations = await Book.find({ isDeleted: false }).limit(4);
+  // ৫. গ্রাফ ২: ডাইনামিক মাসিক প্রগ্রেস (Pages per Month - গত ৬ মাস)
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
 
-  // ৬. সোশাল অ্যাক্টিভিটি (সিমুলেটেড ডাটা - রিকয়ারমেন্ট অনুযায়ী)
-  const activities = [
-    { userName: "Alex M.", action: "finished", target: "Dune", time: "2 hours ago", rating: 5, userPhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex" },
-    { userName: "Sarah J.", action: "started reading", target: "The Hobbit", time: "5 hours ago", userPhoto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" },
-  ];
+  const monthlyRawData = await Library.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+        updatedAt: { $gte: sixMonthsAgo }
+      }
+    },
+    {
+      $group: {
+        _id: { $month: "$updatedAt" },
+        pages: { $sum: "$currentPage" }
+      }
+    },
+    { $sort: { "_id": 1 } }
+  ]);
+
+  // মাসের নাম ম্যাপ করার হেল্পার
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const formattedMonthlyStats = monthlyRawData.map(item => ({
+    name: monthNames[item._id - 1],
+    pages: item.pages
+  }));
+
+  // ৬. পার্সোনালাইজড রিকমেন্ডেশন
+  const recommendations = await RecommendationService.getRecommendations(userId);
+
+  // ৭. ডাইনামিক সোশ্যাল ফিড (লেটেস্ট রিভিউসমূহ)
+  const recentReviews = await Review.find({ status: 'approved' })
+    .sort({ createdAt: -1 })
+    .limit(4)
+    .populate('user', 'name photo')
+    .populate('book', 'title');
 
   return {
     user,
     stats: {
-      streak: 42, // এটি আপনার ইউজার মডেলে ট্র্যাকিং লজিক থাকলে সেখান থেকে আসবে
-      pagesRead: (totalProgress[0]?.total * 3) || 0, // প্রগ্রেস থেকে একটি আনুমানিক পেইজ সংখ্যা
+      streak: user?.currentStreak || 0,
+      pagesRead: pageStats[0]?.total || 0,
       booksFinished
     },
-    challenge: {
-      goal: challengeGoal,
-      progress: booksFinished
+    activeBook: activeReading ? {
+      _id: (activeReading.book as any)._id,
+      title: (activeReading.book as any).title,
+      coverImage: (activeReading.book as any).coverImage,
+      progress: Math.round(((activeReading.currentPage || 0) / (activeReading.book as any).pages) * 100)
+    } : null,
+    charts: {
+      genres: genreBreakdown,
+      monthly: formattedMonthlyStats
     },
+    challenge: { goal: 50, finished: booksFinished },
     recommendations,
-    activities
+    activities: recentReviews.map(rev => ({
+      userName: (rev.user as any)?.name || "Reader",
+      userPhoto: (rev.user as any)?.photo || "/placeholder.png",
+      action: "finished reading",
+      target: (rev.book as any)?.title || "a book",
+      rating: rev.rating,
+      comment: rev.comment
+    }))
   };
 };
 

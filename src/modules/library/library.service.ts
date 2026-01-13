@@ -1,31 +1,33 @@
+import { User } from '../user/user.model';
 import { Library } from './library.model';
 
 const updateLibraryInDB = async (userId: string, payload: any) => {
   const { bookId, currentPage, totalPages, status } = payload;
-  
   let updateData: any = { status };
 
-  // ১. যদি শুধু স্ট্যাটাস পরিবর্তন হয় (যেমন: Browse পেজ থেকে 'Want to Read' ক্লিক করা)
+  // ১. স্ট্যাটাস অনুযায়ী ডাটা সেট করা
   if (status === 'Want to Read') {
     updateData.currentPage = 0;
     updateData.progress = 0;
   } 
-  
-  // ২. যদি বই শেষ হয়ে যায়
   else if (status === 'Read') {
+    // যদি সরাসরি 'Mark as Finished' দেয়
     updateData.currentPage = totalPages || 0;
     updateData.progress = 100;
   }
 
-  // ৩. যদি প্রগ্রেস আপডেট করা হয় (Currently Reading মোডে)
+  // ২. প্রগ্রেস ক্যালকুলেশন (Currently Reading মোডে)
   if (currentPage !== undefined) {
     updateData.currentPage = Number(currentPage);
     if (totalPages) {
-      updateData.progress = Math.round((Number(currentPage) / Number(totalPages)) * 100);
+      updateData.progress = Math.min(Math.round((Number(currentPage) / Number(totalPages)) * 100), 100);
     }
   }
 
-  // ডাটাবেসে আপডেট বা নতুন ইনসার্ট (Upsert)
+  // ৩. ডাইনামিক স্ট্রিক আপডেট করা (Requirement)
+  await updateStreak(userId);
+
+  // ৪. ডাটাবেস আপডেট
   return await Library.findOneAndUpdate(
     { user: userId, book: bookId },
     { $set: updateData },
@@ -46,4 +48,27 @@ const getMyCategorizedLibraryFromDB = async (userId: string) => {
   };
 };
 
-export const LibraryService = { updateLibraryInDB, getMyCategorizedLibraryFromDB };
+
+const updateStreak = async (userId: string) => {
+  const today = new Date().toISOString().split('T')[0]; 
+  const user = await User.findById(userId);
+  if (!user) return;
+
+  const lastDate = user.lastReadingDate;
+  if (lastDate === today) return;
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  if (lastDate === yesterdayStr) {
+    user.currentStreak = (user.currentStreak || 0) + 1;
+  } else {
+    user.currentStreak = 1;
+  }
+
+  user.lastReadingDate = today;
+  await user.save();
+};
+
+export const LibraryService = { updateLibraryInDB, getMyCategorizedLibraryFromDB, updateStreak };
