@@ -1,4 +1,9 @@
-import { z } from 'zod';
-import { AuthValidation } from './auth.validation';
+export interface TLoginUser {
+  email: string;
+  password?: string;
+}
 
-export type TLoginUser = z.infer<typeof AuthValidation.loginValidationSchema>;
+export interface TRegisterUser extends TLoginUser {
+  name: string;
+  photo?: string;
+}
