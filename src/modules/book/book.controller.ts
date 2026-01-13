@@ -35,30 +35,32 @@ const createBook = async (req: Request) => {
   }
 };
 
-// সব বইয়ের লিস্ট পাওয়া
 const getAllBooks = async (req: Request) => {
   try {
-    await dbConnect(); // ডাটাবেস কানেকশন নিশ্চিত করা
+    await dbConnect();
     const { searchParams } = new URL(req.url);
     
-    // কুয়েরি প্যারামিটারগুলো সেফলি নেওয়া
-    const query: any = {};
-    if (searchParams.get('searchTerm')) query.searchTerm = searchParams.get('searchTerm');
-    if (searchParams.get('genre')) query.genre = searchParams.get('genre');
-    if (searchParams.get('sortBy')) query.sortBy = searchParams.get('sortBy');
+    const query = {
+      searchTerm: searchParams.get('searchTerm'),
+      genre: searchParams.get('genre'),
+      sort: searchParams.get('sort'), 
+      rating: searchParams.get('rating'),
+      page: searchParams.get('page') || 1,
+      limit: searchParams.get('limit') || 12,
+    };
 
     const result = await BookService.getAllBooksFromDB(query);
-    return NextResponse.json({ success: true, data: result });
-  } catch (err: any) {
-    // এখানে আসল এরর মেসেজটি পাঠানো হচ্ছে
+
     return NextResponse.json({ 
-      success: false, 
-      message: err.message || "Internal Server Error" 
-    }, { status: 400 });
+      success: true, 
+      data: result.data, 
+      meta: result.meta 
+    });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
   }
 };
 
-// নির্দিষ্ট একটি বইয়ের ডাটা পাওয়া
 const getSingleBook = async (id: string) => {
   try {
     await dbConnect();
@@ -69,7 +71,6 @@ const getSingleBook = async (id: string) => {
   }
 };
 
-// বইয়ের ডাটা আপডেট করা
 const updateBook = async (req: Request, id: string) => {
   try {
     await dbConnect();
@@ -97,7 +98,6 @@ const updateBook = async (req: Request, id: string) => {
   }
 };
 
-// বই ডিলিট করা (Soft Delete)
 const deleteBook = async (id: string) => {
   try {
     await dbConnect();
