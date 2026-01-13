@@ -3,192 +3,216 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { 
-  Flame, BookOpen, Trophy, Plus, 
-  ChevronRight, Loader2, Star, Users 
+  Flame, BookOpen, Trophy, Plus, Clock, 
+  Users, Settings, Search, Star, Sparkles 
 } from 'lucide-react';
+import { 
+  PieChart, Pie, Cell, BarChart, Bar, 
+  XAxis, YAxis, ResponsiveContainer, Tooltip, 
+  CartesianGrid
+} from 'recharts';
 import Image from 'next/image';
 import Link from 'next/link';
+
+const COLORS = ['#22c55e', '#3b82f6', '#f1c40f', '#ef4444', '#8b5cf6'];
 
 const UserDashboard = () => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // এপিআই থেকে ড্যাশবোর্ড ডাটা ফেচ করা
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchStats = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("accessToken");
         const res = await axios.get('/api/v1/user/dashboard-stats', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (res.data.success) {
-          setData(res.data.data);
-        }
-      } catch (err) {
-        console.error("Dashboard data fetch failed");
-      } finally {
-        setLoading(false);
+        if (res.data.success) setData(res.data.data);
+      } catch (err) { 
+        console.error("Dashboard Sync Failed:", err); 
+      } finally { 
+        setLoading(false); 
       }
     };
-    fetchDashboardData();
+    fetchStats();
   }, []);
 
-  // সময়ের ওপর ভিত্তি করে গ্রিটিং সেট করা
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  };
-
   if (loading) return (
-    <div className="h-[80vh] flex flex-col items-center justify-center gap-4 bg-[#05140b]">
-      <Loader2 className="animate-spin text-[#22c55e]" size={48} />
-      <p className="text-gray-500 font-serif italic">Curating your reading space...</p>
+    <div className="h-screen bg-[#05140b] flex items-center justify-center text-white font-serif italic">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-12 h-12 border-4 border-[#22c55e] border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-500">Syncing your library stats...</p>
+      </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#05140b] text-white p-6 lg:p-10 flex flex-col lg:flex-row gap-10 animate-in fade-in duration-700">
-      
-      {/* --- Main Content (Left Side) --- */}
-      <div className="flex-1 space-y-10">
+    <div className="min-h-screen bg-[#05140b] text-white p-8 font-sans">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
         
-        {/* Header Section */}
-        <div className="flex justify-between items-start">
-          <div className="space-y-2">
-            <h1 className="text-5xl font-serif font-bold tracking-tight">
-              {getGreeting()}, {data?.user?.name || "Elena"}
-            </h1>
-            <p className="text-gray-500 italic text-lg">"A room without books is like a body without a soul."</p>
-          </div>
-          <button className="bg-[#f1c40f] text-black px-6 py-3 rounded-xl font-black text-sm flex items-center gap-2 hover:bg-[#d4ac0d] transition-all shadow-xl shadow-yellow-500/10">
-            <Plus size={18} strokeWidth={3} /> Log Reading
-          </button>
-        </div>
-
-        {/* Quick Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { label: 'Day Streak', value: data?.stats?.streak || 0, icon: <Flame size={24}/> },
-            { label: 'Pages Read', value: data?.stats?.pagesRead?.toLocaleString() || 0, icon: <BookOpen size={24}/> },
-            { label: 'Books Finished', value: data?.stats?.booksFinished || 0, icon: <Trophy size={24}/> },
-          ].map((stat, i) => (
-            <div key={i} className="bg-[#112216] border border-gray-800 p-8 rounded-[2.5rem] flex flex-col items-center justify-center space-y-3 hover:border-[#22c55e]/30 transition-all group">
-              <div className="text-gray-600 group-hover:text-[#22c55e] transition-colors">{stat.icon}</div>
-              <h3 className="text-4xl font-bold text-[#f1c40f]">{stat.value}</h3>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">{stat.label}</p>
+        {/* LEFT SECTION */}
+        <div className="flex-1 space-y-8">
+          <header className="flex justify-between items-start">
+            <div>
+              <h1 className="text-4xl font-bold">Welcome back, {data?.user?.name?.split(' ')[0]}</h1>
+              <p className="text-gray-500 text-sm italic">"A room without books is like a body without a soul."</p>
             </div>
-          ))}
-        </div>
-
-        {/* 2026 Challenge Card */}
-        <div className="bg-[#112216] border border-gray-800 rounded-[3rem] p-10 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden">
-          <div className="flex-1 space-y-6">
-             <span className="bg-[#f1c40f]/10 text-[#f1c40f] text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest flex items-center gap-2 w-fit">
-               <Trophy size={12}/> 2026 Challenge
-             </span>
-             <h2 className="text-3xl font-bold">You're ahead of schedule!</h2>
-             <p className="text-gray-500 leading-relaxed max-w-md">
-               You've read {data?.stats?.booksFinished} books so far. To meet your goal of {data?.challenge?.goal || 50} books, you need to read roughly 3 more books this month. Keep it up!
-             </p>
-             <div className="flex gap-6 pt-2">
-               <button className="text-white font-bold border-b-2 border-[#f1c40f] pb-1 text-sm">View Details</button>
-               <button className="text-gray-500 font-bold text-sm">Edit Goal</button>
-             </div>
-          </div>
-          
-          {/* Circular Progress (Requirement) */}
-          <div className="relative w-48 h-48 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle cx="96" cy="96" r="80" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-gray-800" />
-              <circle 
-                cx="96" cy="96" r="80" stroke="currentColor" strokeWidth="12" fill="transparent" 
-                className="text-[#f1c40f]"
-                strokeDasharray={502.4}
-                strokeDashoffset={502.4 - (502.4 * (data?.stats?.booksFinished || 0)) / (data?.challenge?.goal || 50)}
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-               <span className="text-4xl font-bold">{data?.stats?.booksFinished}</span>
-               <span className="text-[10px] text-gray-500 font-black uppercase">of {data?.challenge?.goal || 50}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Curated For You (Recommendations) */}
-        <div className="space-y-8">
-           <div className="flex justify-between items-center">
-              <h3 className="text-2xl font-bold flex items-center gap-3 font-serif italic">
-                <Star className="text-[#f1c40f]" size={20} fill="currentColor"/> Curated For You
-              </h3>
-              <ChevronRight className="text-gray-600 cursor-pointer hover:text-white" />
-           </div>
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {data?.recommendations?.map((book: any) => (
-                <div key={book._id} className="space-y-4 group">
-                   <div className="relative aspect-[3/4.5] rounded-2xl overflow-hidden bg-[#112216] border border-gray-800 group-hover:border-[#f1c40f]/50 transition-all duration-500 shadow-2xl">
-                      <Image src={book.coverImage} alt={book.title} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
-                   </div>
-                   <div>
-                     <h4 className="font-bold text-sm line-clamp-1 group-hover:text-[#f1c40f] transition-colors">{book.title}</h4>
-                     <p className="text-[10px] text-gray-500 font-medium italic">{book.author}</p>
-                   </div>
-                </div>
-              ))}
-           </div>
-        </div>
-      </div>
-
-      {/* --- Sidebar (Social Activity - Right Side) --- */}
-      <aside className="w-full lg:w-80 space-y-10">
-         <div className="bg-[#112216] border border-gray-800 rounded-[2.5rem] p-8 space-y-8">
-            <div className="flex justify-between items-center">
-               <h3 className="font-bold text-lg">Social Activity</h3>
-               <button className="text-[10px] font-bold text-gray-500 hover:text-white uppercase tracking-widest">View All</button>
-            </div>
-            
-            <div className="space-y-8 relative">
-               {/* Activity Timeline Line */}
-               <div className="absolute left-5 top-0 bottom-0 w-[1px] bg-gray-800"></div>
-               
-               {data?.activities?.map((activity: any, i: number) => (
-                 <div key={i} className="flex gap-4 relative z-10">
-                    <div className="w-10 h-10 rounded-full border border-gray-800 bg-gray-900 overflow-hidden flex-shrink-0">
-                       <Image src={activity.userPhoto} alt="User" width={40} height={40} />
-                    </div>
-                    <div className="space-y-1">
-                       <p className="text-xs leading-relaxed">
-                         <span className="font-bold text-[#f1c40f]">{activity.userName}</span> {activity.action} <span className="italic text-gray-400">"{activity.target}"</span>
-                       </p>
-                       <p className="text-[10px] text-gray-600 font-medium">{activity.time}</p>
-                       {activity.rating && (
-                         <div className="flex text-yellow-500 gap-0.5 pt-1">
-                           {[...Array(5)].map((_, idx) => <Star key={idx} size={8} fill={idx < activity.rating ? "currentColor" : "none"} />)}
-                         </div>
-                       )}
-                    </div>
-                 </div>
-               ))}
-            </div>
-
-            <div className="pt-8 border-t border-gray-800 space-y-6">
-               <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Friends Online</h4>
-               <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map((friend) => (
-                    <div key={friend} className="w-10 h-10 rounded-full border-2 border-[#112216] bg-gray-900 overflow-hidden relative">
-                       <Image src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${friend * 5}`} alt="Friend" fill />
-                    </div>
-                  ))}
-                  <div className="w-10 h-10 rounded-full border-2 border-[#112216] bg-gray-800 flex items-center justify-center text-[10px] font-bold text-gray-400">
-                    +3
-                  </div>
+            <div className="flex gap-4">
+               <div className="relative hidden md:block">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                  <input type="text" placeholder="Search library..." className="bg-[#112216] border border-white/5 rounded-xl py-2 pl-10 pr-4 text-xs outline-none focus:border-[#22c55e]/30" />
                </div>
+               <button className="p-2.5 bg-[#112216] rounded-xl border border-white/5"><Settings size={18} className="text-gray-400"/></button>
             </div>
-         </div>
-      </aside>
+          </header>
+
+          {/* Top Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* 2026 Challenge */}
+            <div className="md:col-span-2 bg-[#112216] p-8 rounded-3xl flex items-center gap-8 border border-white/5 relative overflow-hidden group shadow-2xl">
+              <div className="relative w-28 h-28 flex-shrink-0">
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle cx="56" cy="56" r="48" stroke="#1a2e1f" strokeWidth="10" fill="transparent" />
+                  <circle 
+                    cx="56" cy="56" r="48" stroke="#22c55e" strokeWidth="10" fill="transparent" 
+                    strokeDasharray="301.4" 
+                    strokeDashoffset={301.4 - (301.4 * (data?.stats?.booksFinished || 0) / 50)} 
+                    strokeLinecap="round" 
+                    className="transition-all duration-1000"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center font-bold text-2xl">
+                  {Math.round(((data?.stats?.booksFinished || 0) / 50) * 100)}%
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-[#22c55e] text-[10px] font-black uppercase tracking-widest">
+                  <Trophy size={12}/> 2026 Challenge
+                </div>
+                <h3 className="text-2xl font-bold">{data?.stats?.booksFinished || 0} of 50 Books</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">You're on track! Read roughly 3 more books this month to stay ahead.</p>
+              </div>
+            </div>
+
+            {/* Day Streak */}
+            <div className="bg-[#112216] p-8 rounded-3xl border border-white/5 flex flex-col justify-center items-center gap-3 hover:border-orange-500/20 transition-all shadow-xl">
+               <Flame className="text-orange-500" size={24} />
+               <h3 className="text-3xl font-bold text-[#f1c40f]">{data?.stats?.streak || 0}</h3>
+               <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Day Streak</p>
+            </div>
+
+            {/* Total Pages (Fixed Field Name) */}
+            <div className="bg-[#112216] p-8 rounded-3xl border border-white/5 flex flex-col justify-center items-center gap-3 hover:border-blue-500/20 transition-all shadow-xl">
+               <BookOpen className="text-blue-500" size={24} />
+               {/* ✅ সমাধান: ব্যাকএন্ডে 'pagesRead' নামে ডাটা পাঠানো হচ্ছে */}
+               <h3 className="text-3xl font-bold text-[#22c55e]">
+                 {(data?.stats?.pagesRead || 0).toLocaleString()}
+               </h3>
+               <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Total Pages</p>
+            </div>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Genre Breakdown */}
+            <div className="bg-[#112216] p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
+              <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-8">Genre Breakdown</h4>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={data?.charts?.genres || []} innerRadius={60} outerRadius={85} paddingAngle={8} dataKey="value">
+                      {(data?.charts?.genres || []).map((entry: any, index: number) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{backgroundColor: '#05140b', border: 'none', borderRadius: '12px'}} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Monthly Progress (Updated Styling) */}
+            <div className="bg-[#112216] p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
+              <h4 className="text-sm font-black uppercase tracking-widest text-gray-500 mb-8">Monthly Progress</h4>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data?.charts?.monthly || []}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#4b5563', fontSize: 10}} dy={10} />
+                    <Tooltip cursor={{fill: 'rgba(255,255,255,0.05)'}} contentStyle={{backgroundColor: '#05140b', border: 'none', borderRadius: '12px'}} />
+                    <Bar 
+                      dataKey="pages" 
+                      fill="#22c55e" 
+                      radius={[6, 6, 0, 0]} 
+                      barSize={25} // ✅ চিকন বার ডিজাইন করা হয়েছে
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Recommendations Row */}
+          <section className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-[#22c55e]" size={18} />
+                <h4 className="text-xl font-serif font-bold italic">Curated For You</h4>
+              </div>
+              <Link href="/books" className="text-[#22c55e] text-[10px] font-black uppercase tracking-widest hover:underline transition-all">View all</Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {data?.recommendations?.map((book: any) => (
+                <Link href={`/books/${book._id}`} key={book._id} className="group space-y-3">
+                  <div className="relative aspect-[3/4.5] rounded-2xl overflow-hidden border border-white/5 shadow-2xl group-hover:border-[#22c55e]/30 transition-all">
+                    <Image src={book.coverImage} alt="cover" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                  </div>
+                  <div className="px-1">
+                    <h5 className="text-xs font-bold truncate group-hover:text-[#22c55e] transition-colors">{book.title}</h5>
+                    <p className="text-[10px] text-gray-500 italic">by {book.author}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        {/* RIGHT SECTION: Community Sidebar */}
+        <aside className="w-full lg:w-85 bg-[#112216]/40 rounded-[3rem] p-8 border border-white/5 self-start shadow-2xl">
+          <div className="flex justify-between items-center mb-10">
+            <h4 className="font-bold text-xl font-serif">Community</h4>
+            <Users size={20} className="text-gray-500"/>
+          </div>
+          <div className="space-y-10">
+            {data?.activities?.map((act: any, i: number) => (
+              <div key={i} className="flex gap-4 group">
+                <div className="w-11 h-11 rounded-full overflow-hidden flex-shrink-0 border-2 border-white/5 group-hover:border-[#22c55e]/30 transition-all shadow-lg">
+                  <Image src={act.userPhoto} alt="avatar" width={44} height={44} className="object-cover" />
+                </div>
+                <div className="flex-1 space-y-1.5">
+                  <p className="text-xs leading-snug">
+                    <span className="font-bold text-[#f1c40f]">{act.userName}</span> {act.action} <span className="font-medium text-[#22c55e]">"{act.target}"</span>
+                  </p>
+                  <div className="flex text-yellow-500 gap-0.5">
+                    {[...Array(5)].map((_, idx) => (
+                      <Star key={idx} size={10} fill={idx < act.rating ? "currentColor" : "none"} strokeWidth={idx < act.rating ? 0 : 2} />
+                    ))}
+                  </div>
+                  {act.comment && (
+                    <div className="bg-black/20 p-3 rounded-2xl border border-white/5 mt-2">
+                       <p className="text-[10px] text-gray-500 italic leading-relaxed">"{act.comment}"</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <button className="w-full mt-12 bg-white/5 border border-white/10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#22c55e] hover:text-black transition-all shadow-xl active:scale-95">
+            Find Friends
+          </button>
+        </aside>
+      </div>
     </div>
   );
 };
