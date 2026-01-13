@@ -1,261 +1,186 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Star, Bookmark, Share2, ArrowLeft, MessageCircle, Users, Calendar, BookOpen } from "lucide-react";
 
-export default function BookDetails() {
-  const [book, setBook] = useState({
-    title: "The Midnight Library",
-    author: "Matt Haig",
-    coverImage: "https://lh3.googleusercontent.com/aida-public/AB6AXuA48qQnGH4gtrlK6_OwthrqdGuhfSfVAdBkkORzCR6Y4xYefzLTDrP1MDtQh1GTUOtMa0KT9TrS_bbOWZHwYU0zqYgH-BaNCGmDmYNHBOzfVfcS71MA_0RQP0G697abAuD2jlI0tfKmsuKVanh1vi4ficpA4TsIiqNrSql4bzjWu2E81g1NUhi71Z7D9qfhIYuvNk3SFCpGuvA-KlOAXBSKj5MAKuDaE9o3p3YGKHHJNbFTtF-ILWJtC4m4g1k8xKfHznj1lYiIyg",
-    genres: ["Fiction", "Fantasy", "Contemporary", "Philosophical"],
-    description: "Between life and death there is a library, and within that library, the shelves go on forever. Every book provides a chance to try another life you could have lived. To see how things would be if you had made other choices...",
-    averageRating: 4.8,
-    totalRatings: 1240,
-    published: "2020",
-    pages: 320,
-    language: "English"
-  });
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import axios from 'axios';
+import { 
+  Heart, Star, Edit3, Loader2, MessageSquare, Send 
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
-  const [reviews, setReviews] = useState([
-    {
-      _id: "1",
-      user: { name: "BookLover99", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAY9gOywbhZ9zAFJkZ0jjBHXY7SJupJCjsXPd-oN1PGOkhY7U15y2mGA0u0rI_xjqutnh6ZvzcaI8Y125o7MfujKxHeujZO8fReLIsVjHTvTU3uQu4zLzlykYDbICpftzMjbrz-nbQmDHL5tsd9QbXDIniVSeGCBy5r0H62aCiGsjSznf44-pW5UiTOgMKtWSK_QA0LSHQkXrmD4xFdMXiZMHPhTV5Ee4EojctR1amWrwEjtUPNL18J7LnlSYfP5x-q9WQqYemvXQ" },
-      rating: 5,
-      comment: "A beautiful story about regret and the choices we make. It really made me think about my own life. Highly recommend!",
-      date: "2 days ago"
-    },
-    {
-      _id: "2",
-      user: { name: "ReaderTom", avatar: null },
-      rating: 4,
-      comment: "Couldn't put it down. The concept is fascinating, though the middle part felt a bit slow. Still a solid read.",
-      date: "1 week ago"
+const BookDetailsPage = () => {
+  const { id } = useParams();
+  const [book, setBook] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [review, setReview] = useState({ rating: 5, comment: "" });
+
+  // API 1: Fetch Book Details
+  const fetchBook = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/v1/books/${id}`);
+      setBook(res.data.data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
-  const [selectedShelf, setSelectedShelf] = useState(null);
-  const [showShelfMenu, setShowShelfMenu] = useState(false);
+  useEffect(() => { if (id) fetchBook(); }, [id]);
 
-  const shelfOptions = [
-    { name: "Want to Read", icon: BookOpen, color: "text-orange-500" },
-    { name: "Currently Reading", icon: MessageCircle, color: "text-blue-500" },
-    { name: "Read", icon: Star, color: "text-green-500" }
-  ];
+  // API 2: Update Shelf Status & Progress
+  const handleShelfUpdate = async (status: string, pagesRead?: number) => {
+    try {
+      setUpdating(true);
+      await axios.post('/api/v1/shelf', {
+        bookId: id,
+        status: status || book.shelfStatus,
+        currentPage: pagesRead !== undefined ? pagesRead : book.currentPage
+      });
+      fetchBook(); // ডাটা আপডেট হওয়ার পর রি-ফেচ
+    } catch (err) {
+      alert("Failed to update shelf");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // API 3: Submit Review
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setUpdating(true);
+      await axios.post('/api/v1/reviews', {
+        bookId: id,
+        rating: review.rating,
+        comment: review.comment
+      });
+      setReview({ rating: 5, comment: "" });
+      fetchBook();
+    } catch (err) {
+      alert("Error posting review");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) return <div className="h-screen flex items-center justify-center bg-[#05140b]"><Loader2 className="animate-spin text-[#22c55e]" size={48} /></div>;
+
+  const progress = Math.round((book.currentPage / book.pages) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f8f7f6] to-[#ede8e0] dark:from-[#221910] dark:to-[#2c2219]">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#221910]/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <button className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-white/10 transition-colors">
-            <ArrowLeft size={24} className="text-slate-900 dark:text-white" />
-          </button>
-          <div className="flex gap-2">
-            <button className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-white/10 transition-colors">
-              <Bookmark size={24} className="text-slate-900 dark:text-white" />
-            </button>
-            <button className="p-2 rounded-full hover:bg-stone-100 dark:hover:bg-white/10 transition-colors">
-              <Share2 size={24} className="text-slate-900 dark:text-white" />
-            </button>
+    <div className="min-h-screen bg-[#05140b] text-white p-6 md:p-12">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+        
+        {/* Left Col: Cover */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="relative aspect-[3/4.5] rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
+            <Image src={book.image} alt={book.title} fill className="object-cover" />
+          </div>
+          <div className="flex gap-4">
+             <div className="flex-1 bg-[#112216] p-4 rounded-xl border border-gray-800 text-center">
+                <p className="text-[10px] text-gray-500 uppercase font-bold">Rating</p>
+                <p className="text-lg font-bold flex items-center justify-center gap-1">{book.rating} <Star size={14} className="fill-yellow-500 text-yellow-500"/></p>
+             </div>
+             <div className="flex-1 bg-[#112216] p-4 rounded-xl border border-gray-800 text-center">
+                <p className="text-[10px] text-gray-500 uppercase font-bold">Pages</p>
+                <p className="text-lg font-bold">{book.pages}</p>
+             </div>
           </div>
         </div>
-      </header>
 
-      {/* Hero Section with Book Cover */}
-      <div className="relative">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 h-96 bg-cover bg-center blur-xl opacity-30 dark:opacity-20"
-          style={{ backgroundImage: `url(${book.coverImage})` }}
-        ></div>
-        <div className="absolute inset-0 h-96 bg-gradient-to-b from-transparent via-white/50 dark:via-[#221910]/70 to-white dark:to-[#221910]"></div>
+        {/* Right Col: Details */}
+        <div className="lg:col-span-8 space-y-8">
+          <header>
+            <h1 className="text-5xl font-bold font-serif">{book.title}</h1>
+            <p className="text-xl text-[#22c55e] mt-2">by {book.author}</p>
+          </header>
 
-        {/* Book Cover */}
-        <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-8 flex justify-center">
-          <div className="group relative">
-            <div className="absolute -inset-1 bg-gradient-to-r from-[#ec7f13] to-orange-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-            <img
-              src={book.coverImage}
-              alt={book.title}
-              className="relative w-48 sm:w-56 md:w-64 rounded-2xl shadow-2xl object-cover aspect-[2/3]"
-            />
-          </div>
-        </div>
-      </div>
+          <p className="text-gray-400 italic text-lg leading-relaxed">{book.description}</p>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 pb-16">
-        {/* Title & Author Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-2">
-            {book.title}
-          </h1>
-          <p className="text-lg sm:text-xl text-stone-600 dark:text-stone-400 mb-4">
-            by <span className="font-semibold">{book.author}</span>
-          </p>
-
-          {/* Rating */}
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <div className="flex text-[#ec7f13]">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={20}
-                    className={i < Math.floor(book.averageRating) ? "fill-[#ec7f13]" : i < book.averageRating ? "fill-[#ec7f13]" : ""}
-                  />
-                ))}
+          {/* Shelf & Progress Update Card */}
+          <div className="bg-[#112216] border border-gray-800 rounded-2xl p-6 space-y-6">
+            <div className="flex justify-between items-center">
+              <div className="w-1/2">
+                <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Shelf Status</label>
+                <select 
+                  className="w-full bg-[#05140b] border border-gray-700 p-3 rounded-lg outline-none focus:ring-1 focus:ring-[#22c55e]"
+                  value={book.shelfStatus}
+                  onChange={(e) => handleShelfUpdate(e.target.value)}
+                >
+                  <option value="Want to Read">Want to Read</option>
+                  <option value="Reading">Reading</option>
+                  <option value="Read">Read</option>
+                </select>
               </div>
-              <span className="text-2xl font-bold text-slate-900 dark:text-white">{book.averageRating}</span>
-            </div>
-            <span className="text-stone-500 dark:text-stone-400 text-sm">
-              ({book.totalRatings.toLocaleString()} ratings)
-            </span>
-          </div>
-
-          {/* Genres */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {book.genres.map((genre) => (
-              <span
-                key={genre}
-                className="px-4 py-2 bg-stone-100 dark:bg-white/10 rounded-full text-sm font-medium text-slate-900 dark:text-white border border-stone-200 dark:border-white/10"
-              >
-                {genre}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
-          <div className="relative">
-            <button
-              onClick={() => setShowShelfMenu(!showShelfMenu)}
-              className="w-full bg-[#ec7f13] hover:bg-[#d66e0a] text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-[#ec7f13]/30 flex items-center justify-center gap-2 group"
-            >
-              <BookOpen size={20} />
-              <span>Add to Shelf</span>
-            </button>
-
-            {/* Dropdown Menu */}
-            {showShelfMenu && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#2c2219] rounded-xl shadow-xl border border-stone-200 dark:border-white/10 overflow-hidden z-50">
-                {shelfOptions.map((option) => (
-                  <button
-                    key={option.name}
-                    onClick={() => {
-                      setSelectedShelf(option.name);
-                      setShowShelfMenu(false);
-                    }}
-                    className={`w-full px-4 py-3 text-left font-semibold transition-colors flex items-center gap-3 ${
-                      selectedShelf === option.name
-                        ? "bg-[#ec7f13]/10 text-[#ec7f13]"
-                        : "text-slate-900 dark:text-white hover:bg-stone-100 dark:hover:bg-white/5"
-                    }`}
-                  >
-                    <option.icon size={18} className={option.color} />
-                    {option.name}
-                  </button>
-                ))}
+              <div className="text-right">
+                 <p className="text-xs font-bold text-gray-500 uppercase">Progress</p>
+                 <p className="text-2xl font-bold text-[#22c55e]">{progress}%</p>
               </div>
-            )}
-          </div>
-
-          <button className="bg-stone-100 dark:bg-white/10 hover:bg-stone-200 dark:hover:bg-white/20 text-slate-900 dark:text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2">
-            <MessageCircle size={20} />
-            <span>Write Review</span>
-          </button>
-        </div>
-
-        {/* Book Info Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-          <div className="bg-white dark:bg-[#2c2219] p-4 rounded-xl border border-stone-200 dark:border-white/5">
-            <p className="text-sm text-stone-500 dark:text-stone-400 mb-1">Published</p>
-            <p className="text-lg font-bold text-slate-900 dark:text-white">{book.published}</p>
-          </div>
-          <div className="bg-white dark:bg-[#2c2219] p-4 rounded-xl border border-stone-200 dark:border-white/5">
-            <p className="text-sm text-stone-500 dark:text-stone-400 mb-1">Pages</p>
-            <p className="text-lg font-bold text-slate-900 dark:text-white">{book.pages}</p>
-          </div>
-          <div className="bg-white dark:bg-[#2c2219] p-4 rounded-xl border border-stone-200 dark:border-white/5">
-            <p className="text-sm text-stone-500 dark:text-stone-400 mb-1">Language</p>
-            <p className="text-lg font-bold text-slate-900 dark:text-white">{book.language}</p>
-          </div>
-          <div className="bg-white dark:bg-[#2c2219] p-4 rounded-xl border border-stone-200 dark:border-white/5">
-            <p className="text-sm text-stone-500 dark:text-stone-400 mb-1">Readers</p>
-            <p className="text-lg font-bold text-slate-900 dark:text-white">{(book.totalRatings / 100).toFixed(0)}K</p>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="bg-white dark:bg-[#2c2219] p-6 md:p-8 rounded-2xl border border-stone-200 dark:border-white/5 mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Synopsis</h2>
-          <p className="text-stone-700 dark:text-stone-300 leading-relaxed text-lg">
-            {book.description}
-            <button className="ml-2 text-[#ec7f13] font-bold hover:underline">Read more</button>
-          </p>
-        </div>
-
-        {/* Reviews Section */}
-        <div className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-stone-200 dark:border-white/5 pb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Reviews</h2>
-              <p className="text-stone-500 dark:text-stone-400">{reviews.length} reader reviews</p>
             </div>
-            <button className="mt-4 md:mt-0 text-[#ec7f13] font-bold hover:underline flex items-center gap-1">
-              View all {book.totalRatings.toLocaleString()} reviews
-              <ArrowLeft size={16} className="rotate-180" />
-            </button>
+
+            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-full bg-[#22c55e] transition-all" style={{width: `${progress}%`}}></div>
+            </div>
+
+            <div className="flex items-center gap-4">
+               <input 
+                type="number" 
+                className="w-20 bg-[#05140b] border border-gray-700 p-2 rounded text-center"
+                defaultValue={book.currentPage}
+                onBlur={(e) => handleShelfUpdate(book.shelfStatus, Number(e.target.value))}
+               />
+               <span className="text-gray-500">of {book.pages} pages read</span>
+            </div>
           </div>
 
-          {/* Review Cards */}
-          <div className="grid gap-6">
-            {reviews.map((review) => (
-              <div
-                key={review._id}
-                className="bg-white dark:bg-[#2c2219] p-6 rounded-xl border border-stone-200 dark:border-white/5 hover:border-[#ec7f13]/30 transition-all"
-              >
-                {/* Reviewer Info */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    {review.user.avatar ? (
-                      <img
-                        src={review.user.avatar}
-                        alt={review.user.name}
-                        className="w-12 h-12 rounded-full object-cover"
+          {/* Review Section */}
+          <section className="pt-10 space-y-6">
+            <h3 className="text-2xl font-bold border-b border-gray-800 pb-4">Community Reviews</h3>
+            
+            <form onSubmit={handleReviewSubmit} className="space-y-4 bg-[#081b0f] p-6 rounded-xl border border-gray-800">
+               <textarea 
+                className="w-full bg-[#05140b] border border-gray-700 p-4 rounded-lg outline-none focus:border-[#22c55e]"
+                placeholder="What did you think of this book?"
+                value={review.comment}
+                onChange={(e) => setReview({...review, comment: e.target.value})}
+               />
+               <div className="flex justify-between items-center">
+                  <div className="flex gap-2">
+                    {[1,2,3,4,5].map(num => (
+                      <Star 
+                        key={num} 
+                        size={20} 
+                        className={`cursor-pointer ${review.rating >= num ? 'fill-yellow-500 text-yellow-500' : 'text-gray-600'}`}
+                        onClick={() => setReview({...review, rating: num})}
                       />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#ec7f13] to-orange-600 flex items-center justify-center text-white font-bold text-sm">
-                        {review.user.name.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">{review.user.name}</p>
-                      <p className="text-sm text-stone-500 dark:text-stone-400">{review.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex text-[#ec7f13]">
-                    {[...Array(review.rating)].map((_, i) => (
-                      <Star key={i} size={16} className="fill-[#ec7f13]" />
                     ))}
                   </div>
-                </div>
+                  <button type="submit" className="bg-[#22c55e] text-black px-6 py-2 rounded-lg font-bold flex items-center gap-2">
+                    {updating ? <Loader2 className="animate-spin" size={18}/> : <Send size={18}/>} Post Review
+                  </button>
+               </div>
+            </form>
 
-                {/* Review Text */}
-                <p className="text-stone-700 dark:text-stone-300 leading-relaxed">
-                  "{review.comment}"
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Load More */}
-          <button className="w-full py-4 text-[#ec7f13] font-bold hover:bg-[#ec7f13]/5 rounded-lg transition-colors">
-            View all {book.totalRatings.toLocaleString()} reviews
-          </button>
+            <div className="space-y-4 mt-6">
+               {book.reviews.map((rev: any) => (
+                 <div key={rev._id} className="p-4 border border-gray-800 rounded-lg bg-[#112216]/30">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-bold">{rev.userName}</span>
+                      <div className="flex text-yellow-500"><Star size={12} fill="currentColor"/> {rev.rating}</div>
+                    </div>
+                    <p className="text-gray-400 text-sm italic">"{rev.comment}"</p>
+                 </div>
+               ))}
+            </div>
+          </section>
         </div>
-      </main>
+      </div>
     </div>
   );
-}
+};
+
+export default BookDetailsPage;
