@@ -14,7 +14,8 @@ const getAllTutorials = async (req: Request) => {
     return NextResponse.json({
       success: true,
       message: "Tutorials fetched successfully!",
-      data: result
+      data: result.data, 
+      meta: result.meta
     });
   } catch (err: any) {
     return NextResponse.json({ 

@@ -1,7 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { Plus, MoreHorizontal, Loader2, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Plus, MoreHorizontal, TrendingUp, 
+  BookOpen, Users as UsersIcon, MessageSquare, 
+  Activity, ArrowUpRight, Clock, CheckCircle2 
+} from 'lucide-react';
+import Link from 'next/link';
 
 // ============================================================
 // TYPES
@@ -20,521 +25,230 @@ interface DashboardData {
   }>;
 }
 
-// ============================================================
-// AXIOS INSTANCE (From your lib/axios.ts)
-// ============================================================
-const api = {
-  get: async (url: string) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    const response = await fetch(`/api/v1${url}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` })
-      }
-    });
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  }
-};
-
-// ============================================================
-// SKELETON COMPONENTS
-// ============================================================
-function StatsSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-[#112216] p-4 sm:p-6 rounded-2xl border border-gray-800 animate-pulse">
-          <div className="flex justify-between items-start mb-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-800/50 rounded-xl" />
-            <div className="w-12 h-5 bg-gray-800/50 rounded-full" />
-          </div>
-          <div className="h-3 w-24 bg-gray-800/50 rounded mb-2" />
-          <div className="h-8 w-16 bg-gray-800/50 rounded" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function GenreChartSkeleton() {
-  return (
-    <div className="lg:col-span-5 bg-[#112216] p-4 sm:p-6 rounded-2xl border border-gray-800 animate-pulse">
-      <div className="flex justify-between items-center mb-6 sm:mb-8">
-        <div className="h-5 w-32 bg-gray-800/50 rounded" />
-        <div className="w-8 h-8 bg-gray-800/50 rounded-lg" />
-      </div>
-      <div className="space-y-4 sm:space-y-6">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="space-y-2">
-            <div className="flex justify-between">
-              <div className="h-3 w-20 bg-gray-800/50 rounded" />
-              <div className="h-3 w-10 bg-gray-800/50 rounded" />
-            </div>
-            <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-              <div className="h-full w-3/4 bg-gray-700/50 rounded-full" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function UserGrowthSkeleton() {
-  return (
-    <div className="lg:col-span-7 bg-[#112216] p-4 sm:p-6 lg:p-8 rounded-2xl lg:rounded-3xl border border-gray-800 animate-pulse">
-      <div className="flex justify-between items-start mb-6 sm:mb-10">
-        <div>
-          <div className="h-5 w-48 bg-gray-800/50 rounded mb-2" />
-          <div className="h-3 w-32 bg-gray-800/50 rounded" />
-        </div>
-        <div className="h-6 w-20 bg-gray-800/50 rounded-lg" />
-      </div>
-      <div className="h-40 sm:h-56 flex items-end justify-between gap-2 px-2 pb-2">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
-          <div key={i} className="flex flex-col items-center gap-2 sm:gap-4 flex-1">
-            <div 
-              className="w-full max-w-[8px] sm:max-w-[12px] lg:max-w-[20px] rounded-t-full bg-gray-800/50"
-              style={{ height: `${Math.random() * 60 + 40}%` }}
-            />
-            <div className="h-2 w-6 bg-gray-800/50 rounded" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function RecentActivitySkeleton() {
-  return (
-    <div className="bg-[#112216] rounded-2xl border border-gray-800 overflow-hidden animate-pulse">
-      <div className="p-4 sm:p-6 flex justify-between items-center border-b border-gray-800">
-        <div className="h-5 w-32 bg-gray-800/50 rounded" />
-        <div className="h-4 w-16 bg-gray-800/50 rounded" />
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="border-b border-gray-800 bg-black/10">
-            <tr>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4">
-                <div className="h-3 w-16 bg-gray-800/50 rounded" />
-              </th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4">
-                <div className="h-3 w-12 bg-gray-800/50 rounded" />
-              </th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4">
-                <div className="h-3 w-20 bg-gray-800/50 rounded" />
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800/50">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <tr key={i}>
-                <td className="px-4 sm:px-6 py-4 sm:py-5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gray-800/50 rounded-full flex-shrink-0" />
-                    <div className="h-4 w-32 sm:w-48 bg-gray-800/50 rounded" />
-                  </div>
-                </td>
-                <td className="px-4 sm:px-6 py-4 sm:py-5">
-                  <div className="h-6 w-16 bg-gray-800/50 rounded-md" />
-                </td>
-                <td className="px-4 sm:px-6 py-4 sm:py-5">
-                  <div className="h-4 w-24 sm:w-32 bg-gray-800/50 rounded" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// DASHBOARD STATS COMPONENT
-// ============================================================
-function DashboardStats({ 
-  totalBooks, 
-  totalUsers, 
-  pendingReviews 
-}: { 
-  totalBooks: number;
-  totalUsers: number;
-  pendingReviews: number;
-}) {
-  const stats = [
-    { 
-      label: 'Total Books', 
-      value: totalBooks, 
-      trend: '+12%', 
-      icon: '📖',
-      showTrend: true 
-    },
-    { 
-      label: 'Total Readers', 
-      value: totalUsers, 
-      trend: '+5%', 
-      icon: '👥',
-      showTrend: true 
-    },
-    { 
-      label: 'Pending Reviews', 
-      value: pendingReviews, 
-      tag: 'Needs Attention', 
-      icon: '💬',
-      showTrend: false 
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-      {stats.map((stat) => (
-        <div 
-          key={stat.label} 
-          className="bg-[#112216] p-4 sm:p-6 rounded-2xl border border-gray-800 relative overflow-hidden group hover:border-gray-700 transition-all"
-        >
-          <div className="flex justify-between items-start mb-3 sm:mb-4">
-            <div className="p-2 sm:p-3 bg-gray-800/50 rounded-xl text-lg sm:text-xl group-hover:scale-110 transition-transform">
-              {stat.icon}
-            </div>
-            {stat.showTrend && stat.trend && (
-              <span className="text-[9px] sm:text-[10px] font-bold text-[#22c55e] bg-[#22c55e]/10 px-2 py-1 rounded-full">
-                {stat.trend}
-              </span>
-            )}
-            {stat.tag && (
-              <span className="text-[9px] sm:text-[10px] font-bold text-orange-500 bg-orange-500/10 px-2 py-1 rounded-full animate-pulse">
-                {stat.tag}
-              </span>
-            )}
-          </div>
-          <p className="text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest">
-            {stat.label}
-          </p>
-          <h3 className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 text-white">
-            {stat.value.toLocaleString()}
-          </h3>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ============================================================
-// GENRE CHART COMPONENT
-// ============================================================
-function GenreChart({ genreStats }: { genreStats: Array<{ name: string; percentage: number }> }) {
-  return (
-    <div className="lg:col-span-5 bg-[#112216] p-4 sm:p-6 rounded-2xl border border-gray-800">
-      <div className="flex justify-between items-center mb-6 sm:mb-8">
-        <h3 className="font-bold text-white text-sm sm:text-base">Books by Genre</h3>
-        <button 
-          className="text-gray-500 hover:text-gray-300 transition-colors"
-          aria-label="More options"
-        >
-          <MoreHorizontal size={18} />
-        </button>
-      </div>
-      
-      <div className="space-y-4 sm:space-y-6">
-        {genreStats && genreStats.length > 0 ? (
-          genreStats.map((item, idx) => (
-            <div key={item.name} className="space-y-2">
-              <div className="flex justify-between text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-                <span className="text-gray-400 truncate pr-2">{item.name}</span>
-                <span className="text-white flex-shrink-0">{item.percentage}%</span>
-              </div>
-              <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-[#22c55e] transition-all duration-500 ease-out" 
-                  style={{ 
-                    width: `${item.percentage}%`,
-                    opacity: Math.max(0.4, 1 - (idx * 0.15))
-                  }}
-                />
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="text-center text-gray-500 py-8 text-sm">
-            <p>No genre data available</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// USER GROWTH CHART COMPONENT
-// ============================================================
-function UserGrowthChart({ userGrowth }: { userGrowth: Array<{ month: string; count: number; percentage: number }> }) {
-  const currentYear = new Date().getFullYear();
-
-  return (
-    <div className="lg:col-span-7 bg-[#112216] p-4 sm:p-6 lg:p-8 rounded-2xl lg:rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden group">
-      {/* Background Decor */}
-      <div className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 bg-[#00d84a]/5 blur-3xl rounded-full -mr-12 sm:-mr-16 -mt-12 sm:-mt-16" />
-
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6 sm:mb-10">
-        <div>
-          <h3 className="font-bold text-white text-sm sm:text-base lg:text-lg flex items-center gap-2">
-            <TrendingUp size={16} className="text-[#00d84a] sm:w-[18px] sm:h-[18px]" /> Monthly User Growth
-          </h3>
-          <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase font-black tracking-widest mt-1">Platform Performance</p>
-        </div>
-        <span className="text-[9px] sm:text-[10px] font-black bg-[#00d84a]/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[#00d84a] border border-[#00d84a]/20">
-          YEAR {currentYear}
-        </span>
-      </div>
-      
-      <div className="h-40 sm:h-48 lg:h-56 flex items-end justify-between gap-1 sm:gap-2 px-1 sm:px-2 pb-2 relative">
-        {/* Grid Lines */}
-        <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-[0.03]">
-          <div className="w-full h-[1px] bg-white" />
-          <div className="w-full h-[1px] bg-white" />
-          <div className="w-full h-[1px] bg-white" />
-        </div>
-        
-        {/* Bars */}
-        {userGrowth && userGrowth.length > 0 ? (
-          userGrowth.map((item) => (
-            <div key={item.month} className="flex flex-col items-center gap-2 sm:gap-4 flex-1 group/bar relative">
-              {/* Dynamic Bar */}
-              <div 
-                className="w-full max-w-[8px] sm:max-w-[12px] lg:max-w-[20px] rounded-t-full bg-gradient-to-t from-[#00d84a]/5 to-[#00d84a] transition-all duration-1000 group-hover/bar:to-white group-hover/bar:shadow-[0_0_20px_rgba(0,216,74,0.4)]" 
-                style={{ height: `${item.percentage}%` }}
-              />
-              
-              <span className="text-[8px] sm:text-[9px] font-black text-gray-600 uppercase group-hover/bar:text-white transition-colors truncate max-w-full">
-                {item.month.slice(0, 3)}
-              </span>
-              
-              {/* Professional Tooltip */}
-              <div className="absolute -top-8 sm:-top-10 left-1/2 -translate-x-1/2 bg-white text-black text-[9px] sm:text-[10px] font-black px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl opacity-0 group-hover/bar:opacity-100 transition-all shadow-2xl pointer-events-none whitespace-nowrap z-10">
-                {item.count} Users
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45" />
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="flex-1 text-center text-gray-500 text-sm">No data</div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// RECENT ACTIVITY TABLE COMPONENT
-// ============================================================
-function RecentActivityTable({ activities }: { activities: Array<{ id: string; title: string; status: string; date: string }> }) {
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString('en-US', { 
-        month: 'short', 
-        day: '2-digit', 
-        year: 'numeric', 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      });
-    } catch (error) {
-      return dateString;
-    }
-  };
-
-  return (
-    <div className="bg-[#112216] rounded-2xl border border-gray-800 overflow-hidden">
-      <div className="p-4 sm:p-6 flex justify-between items-center border-b border-gray-800">
-        <h3 className="font-bold text-white text-sm sm:text-base">Recent Activity</h3>
-        <button className="text-[#22c55e] text-[10px] sm:text-xs font-bold hover:underline transition-all">
-          View All
-        </button>
-      </div>
-      
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs sm:text-sm min-w-[600px]">
-          <thead className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-800 bg-black/10">
-            <tr>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4">Activity</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4">Status</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4">Date & Time</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800/50">
-            {activities && activities.length > 0 ? (
-              activities.map((activity) => (
-                <tr 
-                  key={activity.id} 
-                  className="hover:bg-white/[0.02] transition-colors"
-                >
-                  <td className="px-4 sm:px-6 py-4 sm:py-5">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <div className="p-1 sm:p-1.5 bg-[#22c55e]/20 text-[#22c55e] rounded-full flex-shrink-0">
-                        <Plus size={12} className="sm:w-[14px] sm:h-[14px]" />
-                      </div>
-                      <span className="font-medium text-gray-200 text-xs sm:text-sm truncate">
-                        {activity.title}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 sm:py-5">
-                    <span className="bg-[#22c55e]/10 text-[#22c55e] text-[9px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-1 rounded-md uppercase whitespace-nowrap inline-block">
-                      {activity.status}
-                    </span>
-                  </td>
-                  <td className="px-4 sm:px-6 py-4 sm:py-5 text-gray-400 text-[10px] sm:text-xs whitespace-nowrap">
-                    {formatDate(activity.date)}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={3} className="px-4 sm:px-6 py-8 sm:py-12 text-center text-gray-500 text-xs sm:text-sm">
-                  No recent activities
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================
-// MAIN DASHBOARD CLIENT COMPONENT
-// ============================================================
-export function DashboardClient() {
+export function DashboardClient({ initialData, initialGrowth }: { initialData: any, initialGrowth: any[] }) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Fetch main dashboard stats
-        const statsRes = await api.get('/admin/stats');
-        
-        // Fetch user growth data separately
-        const growthRes = await api.get('/admin/user-growth');
-        
-        if (statsRes.success) {
-          const dashboardData: DashboardData = {
-            totalBooks: statsRes.data.totalBooks || 0,
-            totalUsers: statsRes.data.totalUsers || 0,
-            pendingReviews: statsRes.data.pendingReviews || 0,
-            genreStats: statsRes.data.genreStats || [],
-            userGrowth: growthRes.success ? growthRes.data : [],
-            recentActivities: statsRes.data.recentActivities || []
-          };
-          
-          setData(dashboardData);
-        } else {
-          setError('Failed to load dashboard data');
-        }
-      } catch (err: any) {
-        console.error('Dashboard sync failed:', err);
-        setError(err.message || 'Failed to load dashboard');
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (initialData) {
+      setData({
+        totalBooks: initialData.totalBooks || 0,
+        totalUsers: initialData.totalUsers || 0,
+        pendingReviews: initialData.pendingReviews || 0,
+        genreStats: initialData.genreStats || [],
+        userGrowth: initialGrowth || [],
+        recentActivities: initialData.recentActivities || []
+      });
+      setLoading(false);
+    }
+  }, [initialData, initialGrowth]);
 
-    fetchDashboardData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="space-y-6 sm:space-y-8">
-        {/* Header Skeleton */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 animate-pulse">
-          <div>
-            <div className="h-8 sm:h-10 w-48 sm:w-64 bg-gray-800/50 rounded mb-2" />
-            <div className="h-4 w-56 sm:w-72 bg-gray-800/50 rounded" />
-          </div>
-          <div className="h-10 w-32 sm:w-40 bg-gray-800/50 rounded-lg" />
-        </div>
-
-        <StatsSkeleton />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-          <GenreChartSkeleton />
-          <UserGrowthSkeleton />
-        </div>
-        
-        <RecentActivitySkeleton />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-[60vh] flex flex-col items-center justify-center gap-4 px-4">
-        <div className="text-red-500 text-center max-w-md">
-          <p className="text-lg sm:text-xl font-bold mb-2">Failed to Load Dashboard</p>
-          <p className="text-xs sm:text-sm text-gray-500">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-4 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#22c55e] text-black rounded-lg text-xs sm:text-sm font-bold hover:bg-[#1bb054] transition-all"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) {
-    return (
-      <div className="h-[60vh] flex items-center justify-center px-4">
-        <p className="text-gray-500 text-sm">No data available</p>
-      </div>
-    );
-  }
+  if (loading) return <DashboardSkeleton />;
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-500">
-      {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold font-serif text-white">
-            Good morning, Admin
+    <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 animate-in fade-in duration-700 pb-10">
+      
+      {/* 1. Header Section (Responsive) */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b border-white/5 pb-8">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-[#22c55e] rounded-full animate-pulse" />
+            <p className="text-[#22c55e] text-[10px] font-black uppercase tracking-[0.3em]">Management Console</p>
+          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-medium text-white tracking-tight leading-tight">
+            Greetings, Librarian
           </h1>
-          <p className="text-gray-500 text-xs sm:text-sm mt-1">
-            Here is what is happening with your library today.
+          <p className="text-gray-500 text-xs sm:text-sm italic max-w-md">
+            Monitoring the pulse of your digital library community and content inventory.
           </p>
         </div>
-        <button 
-          className="bg-[#22c55e] text-black px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-2 hover:bg-[#1bb054] transition-all shadow-lg shadow-[#22c55e]/20 w-full sm:w-auto justify-center"
-          aria-label="Add new book"
+        <Link 
+          href="/admin/books/add"
+          className="bg-[#22c55e] text-black px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center gap-2 hover:bg-[#1bb054] transition-all shadow-xl shadow-[#22c55e]/10 w-full sm:w-auto justify-center group"
         >
-          <Plus size={16} className="sm:w-[18px] sm:h-[18px]" /> Add New Book
-        </button>
+          <Plus size={16} className="group-hover:rotate-90 transition-transform" /> Add New Entry
+        </Link>
       </div>
 
-      {/* Stats Cards */}
-      <DashboardStats
-        totalBooks={data.totalBooks}
-        totalUsers={data.totalUsers}
-        pendingReviews={data.pendingReviews}
-      />
-
-      {/* Middle Section: Genre & Growth */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
-        <GenreChart genreStats={data.genreStats} />
-        <UserGrowthChart userGrowth={data.userGrowth} />
+      {/* 2. Stats Grid (Responsive stack to 3 cols) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <StatCard label="Cataloged Books" value={data?.totalBooks || 0} icon={<BookOpen size={22}/>} trend="+12%" color="green" />
+        <StatCard label="Active Readers" value={data?.totalUsers || 0} icon={<UsersIcon size={22}/>} trend="+5%" color="blue" />
+        <StatCard label="Pending Reviews" value={data?.pendingReviews || 0} icon={<MessageSquare size={22}/>} tag="Attention" color="orange" />
       </div>
 
-      {/* Recent Activity Table */}
-      <RecentActivityTable activities={data.recentActivities} />
+      {/* 3. Charts Section (Responsive Grid) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* Genre Insights */}
+        <div className="lg:col-span-5 bg-[#112216] p-6 sm:p-8 rounded-[2rem] border border-white/5 shadow-2xl space-y-8 h-full">
+          <div className="flex justify-between items-center">
+             <div className="space-y-1">
+                <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
+                  <Activity size={18} className="text-[#22c55e]"/> Genre Insights
+                </h3>
+                <p className="text-[9px] text-gray-600 uppercase font-bold tracking-widest">Library distribution</p>
+             </div>
+             <button className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-500">
+                <MoreHorizontal size={20} />
+             </button>
+          </div>
+          
+          <div className="space-y-6">
+            {data?.genreStats.map((item, idx) => (
+              <div key={idx} className="space-y-3 group">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                  <span className="text-gray-400 group-hover:text-white transition-colors">{item.name}</span>
+                  <span className="text-[#22c55e]">{item.percentage}%</span>
+                </div>
+                <div className="h-1.5 bg-black/40 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-[#22c55e] transition-all duration-1000 ease-out" 
+                    style={{ width: `${item.percentage}%`, opacity: 1 - (idx * 0.12) }} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Growth Visualizer */}
+        <div className="lg:col-span-7 bg-[#112216] p-6 sm:p-8 rounded-[2rem] border border-white/5 shadow-2xl relative overflow-hidden group h-full">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-[#22c55e]/5 blur-[100px] rounded-full -mr-32 -mt-32" />
+           
+           <div className="flex justify-between items-start mb-10">
+             <div className="space-y-1">
+               <h3 className="text-white font-bold text-base sm:text-lg flex items-center gap-2">
+                 <TrendingUp size={18} className="text-[#22c55e]"/> Membership Velocity
+               </h3>
+               <p className="text-[10px] text-gray-600 uppercase font-bold tracking-widest">Growth Analytics</p>
+             </div>
+             <span className="bg-black/40 px-3 py-1.5 rounded-xl text-[9px] font-black text-[#22c55e] border border-white/5 flex items-center gap-1.5">
+               <div className="w-1.5 h-1.5 bg-[#22c55e] rounded-full" /> YEAR 2026
+             </span>
+           </div>
+           
+           <div className="h-48 sm:h-56 flex items-end justify-between gap-1 sm:gap-2 px-1 relative">
+             {data?.userGrowth.map((item, i) => (
+               <div key={i} className="flex-1 flex flex-col items-center gap-3 group/bar relative">
+                 <div 
+                   className="w-full max-w-[28px] bg-gradient-to-t from-[#22c55e]/10 via-[#22c55e]/40 to-[#22c55e] rounded-t-lg sm:rounded-t-xl transition-all duration-1000 group-hover/bar:to-white group-hover/bar:shadow-[0_0_25px_rgba(34,197,94,0.3)]" 
+                   style={{ height: `${item.percentage}%` }} 
+                 />
+                 <span className="text-[8px] font-black text-gray-600 uppercase group-hover/bar:text-white transition-all">
+                    {item.month.slice(0,3)}
+                 </span>
+                 
+                 {/* Tooltip (Desktop Only for better UX) */}
+                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-black text-[9px] font-black px-2.5 py-1.5 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-all pointer-events-none whitespace-nowrap shadow-2xl z-10 hidden sm:block">
+                   {item.count} Readers
+                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45" />
+                 </div>
+               </div>
+             ))}
+           </div>
+        </div>
+      </div>
+
+      {/* 4. Activity Table (Scrollable on Mobile) */}
+      <div className="bg-[#112216] rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+        <div className="p-6 sm:p-8 border-b border-white/5 flex justify-between items-center bg-black/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-black/40 rounded-xl flex items-center justify-center text-[#c19a6b]">
+              <Clock size={20} />
+            </div>
+            <h3 className="text-white font-bold text-base sm:text-lg">Recent Library Activity</h3>
+          </div>
+          <button className="text-[#22c55e] text-[10px] font-black uppercase tracking-widest hover:underline transition-all">View Full Logs</button>
+        </div>
+        
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left min-w-[600px]">
+            <thead className="bg-black/10 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-gray-600 border-b border-white/5">
+              <tr>
+                <th className="px-8 py-5">Event Description</th>
+                <th className="px-8 py-5">Verification Status</th>
+                <th className="px-8 py-5 text-right">Date & Time</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {data?.recentActivities.map((activity) => (
+                <tr key={activity.id} className="hover:bg-white/[0.01] transition-all group">
+                  <td className="px-8 py-6 flex items-center gap-4">
+                    <div className="w-8 h-8 bg-[#22c55e]/5 rounded-full flex items-center justify-center text-[#22c55e] border border-[#22c55e]/10 group-hover:bg-[#22c55e] group-hover:text-black transition-all">
+                      <Plus size={14}/>
+                    </div>
+                    <span className="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">{activity.title}</span>
+                  </td>
+                  <td className="px-8 py-6">
+                    <div className="flex items-center gap-2 text-[#22c55e] bg-[#22c55e]/5 w-fit px-3 py-1 rounded-full border border-[#22c55e]/10">
+                      <CheckCircle2 size={10} />
+                      <span className="text-[9px] font-black uppercase tracking-tighter">{activity.status}</span>
+                    </div>
+                  </td>
+                  <td className="px-8 py-6 text-right text-[10px] text-gray-500 font-mono">
+                    {new Date(activity.date).toLocaleString('en-US', { 
+                      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- Reusable Stat Card Component ---
+function StatCard({ label, value, icon, trend, tag, color }: any) {
+  return (
+    <div className="bg-[#112216] p-6 sm:p-8 rounded-[2rem] border border-white/5 hover:border-[#22c55e]/30 transition-all shadow-xl group relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-2xl group-hover:bg-[#22c55e]/10 transition-colors" />
+      
+      <div className="flex justify-between items-start mb-6 relative z-10">
+        <div className="p-4 bg-black/40 rounded-2xl text-[#22c55e] group-hover:scale-110 group-hover:bg-[#22c55e] group-hover:text-black transition-all duration-500 shadow-inner">
+          {icon}
+        </div>
+        {trend && (
+          <div className="flex items-center gap-1 text-[10px] font-black text-[#22c55e] bg-[#22c55e]/10 px-3 py-1 rounded-full border border-[#22c55e]/10">
+            <ArrowUpRight size={10} /> {trend}
+          </div>
+        )}
+        {tag && (
+          <span className="text-[9px] font-black text-orange-500 bg-orange-500/10 px-3 py-1 rounded-full animate-pulse border border-orange-500/20 uppercase tracking-widest">
+            {tag}
+          </span>
+        )}
+      </div>
+      
+      <div className="relative z-10">
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.25em] mb-1">{label}</p>
+        <h3 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+          {value.toLocaleString()}
+        </h3>
+      </div>
+    </div>
+  );
+}
+
+// --- Professional Dashboard Skeleton ---
+function DashboardSkeleton() {
+  return (
+    <div className="max-w-7xl mx-auto space-y-10 p-4 animate-pulse">
+      <div className="flex flex-col sm:flex-row justify-between gap-6">
+        <div className="space-y-3"><div className="h-4 w-32 bg-white/5 rounded"/><div className="h-12 w-64 bg-white/5 rounded-xl"/></div>
+        <div className="h-14 w-40 bg-white/5 rounded-2xl" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[1, 2, 3].map(i => <div key={i} className="h-48 bg-white/5 rounded-[2rem]" />)}
+      </div>  
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-5 h-80 bg-white/5 rounded-[2rem]" />
+        <div className="lg:col-span-7 h-80 bg-white/5 rounded-[2rem]" />
+      </div>
     </div>
   );
 }

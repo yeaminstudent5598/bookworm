@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Search, Loader2, Trash2, CheckCircle2, Star } from "lucide-react";
+import { 
+  Search, Loader2, Trash2, Check, Star, Inbox, 
+  Clock, UserCheck, CheckCircle2, X 
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -13,9 +16,16 @@ export default function ReviewModerationClient({ initialReviews }: { initialRevi
   const [activeTab, setActiveTab] = useState("pending");
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Success Modal States
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // ১. ডাটা ফেচ করার লজিক (ট্যাব অনুযায়ী)
   const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
+      setReviews([]); // ট্যাব পরিবর্তনের সময় পুরনো ডাটা মুছে ফেলা
+      
       const token = localStorage.getItem("accessToken");
       const res = await axios.get(`/api/v1/admin/reviews?status=${activeTab}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -25,128 +35,210 @@ export default function ReviewModerationClient({ initialReviews }: { initialRevi
         setReviews(res.data.data);
       }
     } catch (err: any) {
-      if (err.response?.status === 403) alert("Access Denied! Admin only.");
+      console.error("Fetch error:", err.message);
     } finally {
       setLoading(false);
     }
   }, [activeTab]);
 
-  // যখন ট্যাব পরিবর্তন হবে তখন ডাটা ফেচ হবে
   useEffect(() => {
-    if (activeTab !== "pending") fetchReviews();
-  }, [activeTab, fetchReviews]);
+    fetchReviews();
+  }, [fetchReviews]);
 
-  const handleStatusUpdate = async (id: string, action: 'approve' | 'delete') => {
+  // ২. রিভিউ একশন হ্যান্ডলার (Approve/Delete)
+  const handleAction = async (id: string, action: 'approve' | 'delete') => {
     try {
       const token = localStorage.getItem("accessToken");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-
+      
       if (action === 'approve') {
-        await axios.patch(`/api/v1/admin/reviews/${id}`, { status: 'approved' }, config);
+        const res = await axios.patch(`/api/v1/admin/reviews/${id}`, { status: 'approved' }, config);
+        if (res.data.success) {
+          setSuccessMessage("Review has been approved and is now public.");
+          setShowSuccessModal(true); // 🔥 সাকসেস মোডাল শো করা
+        }
       } else {
-        if (!window.confirm("Delete this review permanently?")) return;
+        if (!window.confirm("Delete permanently?")) return;
         await axios.delete(`/api/v1/admin/reviews/${id}`, config);
       }
       
-      fetchReviews();
-      router.refresh(); // সার্ভার স্টেট সিঙ্ক করার জন্য
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Operation failed.");
+      fetchReviews(); 
+      router.refresh(); // সার্ভার ডাটা সিঙ্ক
+    } catch (err) {
+      alert("Action failed!");
     }
   };
 
-  const filteredReviews = reviews.filter(rev => 
-    rev.book?.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    rev.user?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredReviews = reviews?.filter(rev => 
+    rev.book?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    rev.user?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
+
+  // --- 💀 Professional Skeleton Loader ---
+  const CardSkeleton = () => (
+    <div className="space-y-6">
+      {[1, 2].map((i) => (
+        <div key={i} className="bg-[#1a140f] border border-white/5 rounded-2xl p-6 sm:p-8 animate-pulse space-y-6">
+           <div className="flex justify-between"><div className="w-40 h-8 bg-white/5 rounded-full"/><div className="w-16 h-3 bg-white/5 rounded"/></div>
+           <div className="flex gap-6">
+              <div className="w-20 h-28 bg-white/5 rounded-lg" />
+              <div className="flex-1 space-y-3"><div className="h-4 bg-white/5 w-1/2 rounded"/><div className="h-16 bg-white/5 w-full rounded-xl"/></div>
+           </div>
+        </div>
+      ))}
+    </div>
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500 pb-10">
+    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">
+      
+      {/* Header Area */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h1 className="text-4xl font-serif font-bold text-white tracking-tight">Review Moderation</h1>
-          <p className="text-gray-500 mt-1 text-sm italic">Approve or remove community feedback.</p>
+        <div className="space-y-1">
+          <h1 className="text-3xl font-serif font-bold text-white tracking-tight">Review Portal</h1>
+          <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">Administrative Control</p>
         </div>
-        <div className="bg-[#112216] border border-gray-800 px-6 py-3 rounded-2xl">
-          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Queue Size</p>
-          <h3 className="text-2xl font-bold text-[#22c55e]">{filteredReviews.length}</h3>
+        <div className="relative w-full md:w-80">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+          <input 
+            type="text" placeholder="Search book or user..."
+            className="w-full bg-[#112216] border border-white/5 rounded-xl py-3 pl-12 pr-6 text-xs text-white outline-none focus:ring-1 focus:ring-[#c19a6b] transition-all"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="bg-[#112216] rounded-[2rem] border border-gray-800 overflow-hidden shadow-2xl">
-        <div className="flex border-b border-gray-800 bg-black/20">
-          {["pending", "approved"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-5 text-[10px] font-black uppercase tracking-[0.2em] transition-all ${
-                activeTab === tab ? "text-[#22c55e] border-b-2 border-[#22c55e] bg-white/[0.03]" : "text-gray-600 hover:text-gray-400"
-              }`}
-            >
-              {tab} Reviews
-            </button>
-          ))}
-        </div>
+      {/* Tabs System */}
+      <div className="flex border-b border-white/5 gap-2">
+        {["pending", "approved"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-6 py-4 text-[10px] font-black uppercase tracking-widest transition-all relative ${
+              activeTab === tab ? "text-[#c19a6b]" : "text-gray-600 hover:text-gray-400"
+            }`}
+          >
+            {tab} Queue ({activeTab === tab ? filteredReviews.length : "..."})
+            {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#c19a6b]" />}
+          </button>
+        ))}
+      </div>
 
-        <div className="p-6">
-          <div className="relative mb-8">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={18} />
-            <input 
-              type="text" placeholder="Search by book or user..."
-              className="w-full bg-[#05140b] border border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-sm text-white outline-none focus:border-[#22c55e]"
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
-            {loading ? (
-              <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-[#22c55e]" size={40} /></div>
-            ) : filteredReviews.length > 0 ? (
-              filteredReviews.map((review) => (
-                <div key={review._id} className="bg-black/40 border border-gray-800/50 rounded-[1.5rem] p-6 hover:border-[#22c55e]/20 transition-all">
-                  <div className="flex flex-col md:flex-row gap-6">
-                    <div className="flex gap-4 min-w-[200px]">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-800 flex-shrink-0">
-                        <Image src={review.user?.photo || "/placeholder-avatar.png"} alt="User" fill className="object-cover" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-200">{review.user?.name}</h4>
-                        <p className="text-[10px] text-gray-600 uppercase font-black tracking-tighter">Verified Reader</p>
-                      </div>
-                    </div>
-
-                    <div className="flex-1 flex gap-6">
-                       <div className="relative w-14 h-20 rounded-lg overflow-hidden border border-gray-800 flex-shrink-0">
-                          <Image src={review.book?.coverImage || "/placeholder-book.png"} alt="Book" fill className="object-cover" />
-                       </div>
-                       <div className="space-y-2 flex-1">
-                          <div className="flex justify-between items-center">
-                             <h3 className="font-bold text-white leading-tight">{review.book?.title}</h3>
-                             <div className="flex text-yellow-500 gap-0.5 ml-4">
-                                {[...Array(5)].map((_, i) => <Star key={i} size={12} fill={i < review.rating ? "currentColor" : "none"} />)}
-                             </div>
-                          </div>
-                          <div className="bg-[#05140b] p-4 rounded-xl border border-gray-800/50">
-                             <p className="text-xs text-gray-400 italic leading-relaxed">"{review.comment}"</p>
-                          </div>
-                       </div>
-                    </div>
-
-                    <div className="flex md:flex-col justify-end gap-3">
-                      <button onClick={() => handleStatusUpdate(review._id, 'delete')} className="p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all" title="Delete"><Trash2 size={20} /></button>
-                      {review.status === 'pending' && (
-                        <button onClick={() => handleStatusUpdate(review._id, 'approve')} className="p-3 bg-[#2d5a4c] text-[#22c55e] hover:bg-[#22c55e] hover:text-black rounded-xl transition-all shadow-lg" title="Approve"><CheckCircle2 size={20} /></button>
-                      )}
-                    </div>
+      {/* Reviews Display Area */}
+      <div className="space-y-6">
+        {loading ? (
+          <CardSkeleton />
+        ) : filteredReviews.length > 0 ? (
+          filteredReviews.map((review) => (
+            <div key={review._id} className="bg-[#1a140f] border border-white/5 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden group hover:border-[#c19a6b]/20 transition-all">
+              
+              {/* Card Top */}
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-black/40">
+                    <Image src={review.user?.photo || "/placeholder-avatar.png"} alt="User" fill className="object-cover" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-100 text-sm flex items-center gap-2">
+                      {review.user?.name}
+                      <span className="bg-white/5 text-[7px] px-2 py-0.5 rounded text-gray-500 font-black uppercase tracking-tighter flex items-center gap-1">
+                        <UserCheck size={8} className="text-[#22c55e]"/> Verified
+                      </span>
+                    </h4>
+                    <p className="text-[9px] text-gray-600 flex items-center gap-1.5 mt-0.5 uppercase font-bold">
+                      <Clock size={10}/> {review.createdAt ? new Date(review.createdAt).toLocaleDateString() : "Just now"}
+                    </p>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="py-20 text-center text-gray-600 italic">No reviews found in this queue.</div>
-            )}
+                <div className={`px-3 py-1 rounded text-[8px] font-black uppercase tracking-widest ${
+                  review.status === 'pending' ? 'bg-orange-500/10 text-orange-400' : 'bg-green-500/10 text-green-400'
+                }`}>
+                  {review.status}
+                </div>
+              </div>
+
+              {/* Card Content */}
+              <div className="flex flex-col sm:flex-row gap-8 items-start">
+                <div className="relative w-20 h-28 rounded-lg overflow-hidden border border-white/5 flex-shrink-0 shadow-xl">
+                   <Image src={review.book?.coverImage || "/placeholder-book.png"} alt="Book" fill className="object-cover" />
+                </div>
+                <div className="flex-1 w-full space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-serif font-bold text-lg text-white leading-tight">{review.book?.title}</h3>
+                      <p className="text-[10px] text-gray-500 italic">by {review.book?.author}</p>
+                    </div>
+                    <div className="flex text-yellow-500 gap-0.5 bg-black/40 px-2 py-1 rounded-lg border border-white/5">
+                      {[...Array(5)].map((_, i) => <Star key={i} size={10} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "" : "text-gray-800"} />)}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#0d0a07] p-4 rounded-xl border border-white/5 relative">
+                    <p className="text-xs text-gray-400 italic leading-relaxed font-serif line-clamp-3">
+                      "{review.comment}"
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Compact Action Buttons */}
+              <div className="flex justify-end items-center gap-3 mt-6 pt-6 border-t border-white/5">
+                <button 
+                  onClick={() => handleAction(review._id, 'delete')}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500/5 text-red-500 hover:bg-red-500 hover:text-white rounded-lg text-[9px] font-black uppercase tracking-widest transition-all"
+                >
+                  <Trash2 size={14}/> Delete
+                </button>
+                {review.status === 'pending' && (
+                  <button 
+                    onClick={() => handleAction(review._id, 'approve')}
+                    className="flex items-center gap-2 px-5 py-2 bg-[#2d4a3e] text-[#22c55e] hover:bg-[#22c55e] hover:text-black rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-lg"
+                  >
+                    <Check size={14}/> Approve Review
+                  </button>
+                )}
+              </div>
+
+            </div>
+          ))
+        ) : (
+          <div className="py-32 flex flex-col items-center justify-center space-y-4 text-gray-700 border-2 border-dashed border-white/5 rounded-[2rem]">
+            <Inbox size={48} className="opacity-10" />
+            <p className="font-serif italic text-sm opacity-50">Queue is empty</p>
+          </div>
+        )}
+      </div>
+
+      {/* --- ✅ Success Modal (image_c7d0cb style) --- */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-[#1a140f] w-full max-w-sm rounded-[2.5rem] border border-white/10 p-10 text-center space-y-8 shadow-2xl relative">
+            <button onClick={() => setShowSuccessModal(false)} className="absolute top-6 right-6 text-gray-600 hover:text-white transition-colors">
+              <X size={20} />
+            </button>
+
+            {/* Success Icon */}
+            <div className="w-20 h-20 bg-[#22c55e]/20 rounded-full flex items-center justify-center mx-auto border border-[#22c55e]/30">
+               <CheckCircle2 size={40} className="text-[#22c55e]" />
+            </div>
+
+            <div className="space-y-2">
+              <h2 className="text-2xl font-serif font-bold text-white">Review Approved!</h2>
+              <p className="text-xs text-gray-500 leading-relaxed uppercase tracking-tighter px-4">
+                {successMessage}
+              </p>
+            </div>
+
+            <button 
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full py-4 bg-[#c19a6b] text-black rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-[#d4ac7d] transition-all"
+            >
+              Continue Moderating
+            </button>
           </div>
         </div>
-      </div>
+      )}
+
     </div>
   );
 }
