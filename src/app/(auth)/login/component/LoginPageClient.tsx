@@ -140,18 +140,6 @@ export default function LoginPageClient() {
             <span className="bg-[#1a120b] px-4 text-gray-500 font-bold tracking-widest">Or continue with</span>
           </div>
         </div>
-
-        {/* Social Login */}
-        <div className="w-full">
-          <button 
-            type="button"
-            className="flex w-full items-center justify-center gap-3 h-14 bg-[#2d2116] border border-white/5 rounded-2xl text-white font-semibold hover:bg-[#3a2c1e] transition-all duration-300 group"
-          >
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5 group-hover:scale-110 transition-transform" alt="Google" />
-            Sign in with Google
-          </button>
-        </div>
-
         {/* Register Link */}
         <p className="text-center mt-10 text-gray-400 text-sm">
           New here?{" "}

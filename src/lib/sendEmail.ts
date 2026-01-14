@@ -14,5 +14,5 @@ export const sendEmail = async (email: string, subject: string, data: any) => {
   const templatePath = path.join(process.cwd(), 'src/lib/templates/forgotPassword.ejs');
   const html = await ejs.renderFile(templatePath, data);
 
-  await transporter.sendMail({ from: process.env.SMTP_FROM, to: email, subject, html });
+  await transporter.sendMail({ from: process.env.SMTP_FROM, to: email, subject});
 };

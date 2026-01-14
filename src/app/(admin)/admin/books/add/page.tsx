@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 async function getGenres() {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bookworm-xi-blond.vercel.app';
     const res = await fetch(`${baseUrl}/api/v1/genres`, { cache: 'no-store' });
 
     if (!res.ok) throw new Error('Failed to fetch');

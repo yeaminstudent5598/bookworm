@@ -11,7 +11,7 @@ async function getInitialUsers() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('accessToken')?.value;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bookworm-xi-blond.vercel.app';
     
     const res = await fetch(`${baseUrl}/api/v1/admin/users`, {
       cache: 'no-store',

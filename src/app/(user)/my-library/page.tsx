@@ -11,7 +11,7 @@ interface Props {
 // Server-side data fetching
 async function fetchUserLibrary(token: string) {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bookworm-xi-blond.vercel.app';
 
     console.log('📚 Fetching user library...');
 

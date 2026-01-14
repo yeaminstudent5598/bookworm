@@ -48,7 +48,7 @@ interface ClientProps {
 }
 
 const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
-  // ✅ ALL HOOKS MUST BE AT TOP - Before any conditional returns
+  // ALL HOOKS MUST BE AT TOP - Before any conditional returns
   const [book, setBook] = useState<Book>(initialBook);
   const [updating, setUpdating] = useState(false);
   const [review, setReview] = useState({ rating: 5, comment: '' });
@@ -62,7 +62,7 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
   
   const reviewFormRef = useRef<HTMLFormElement>(null);
 
-  // ✅ Load user progress on mount
+  // Load user progress on mount
   useEffect(() => {
     const loadUserProgress = async () => {
       try {
@@ -92,7 +92,7 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
     loadUserProgress();
   }, [bookId]);
 
-  // ✅ Scroll to top listener
+  // Scroll to top listener
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
@@ -101,7 +101,7 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // ✅ Refresh book data callback
+  // Refresh book data callback
   const refreshBook = useCallback(async () => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -116,7 +116,7 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
     }
   }, [bookId]);
 
-  // ✅ Update shelf status
+  // Update shelf status
   const handleShelfUpdate = async (status: 'Want to Read' | 'Currently Reading' | 'Read') => {
     try {
       setUpdating(true);
@@ -135,7 +135,7 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
     }
   };
 
-  // ✅ Update reading progress
+  // Update reading progress
   const handleProgressUpdate = async () => {
     try {
       setUpdating(true);
@@ -153,7 +153,7 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
     }
   };
 
-  // ✅ Submit review
+  // Submit review
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (review.comment.length < 10) {
@@ -179,12 +179,12 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
     }
   };
 
-  // ✅ Show skeleton while loading - NOW ALL HOOKS HAVE BEEN CALLED
+  //   Show skeleton while loading - NOW ALL HOOKS HAVE BEEN CALLED
   if (loading) {
     return <BookDetailsSkeleton />;
   }
 
-  // ✅ Calculate progress
+  //   Calculate progress
   const totalPages = book?.pages || 1;
   const progressPercent = Math.min(Math.round((localPage / totalPages) * 100), 100);
   const approvedReviews = book?.reviews?.filter(r => r.status === 'approved') || [];
@@ -260,26 +260,6 @@ const BookDetailsClient = ({ initialBook, bookId }: ClientProps) => {
                     </p>
                     <p className="text-lg font-bold text-gray-300">{book.pubYear}</p>
                   </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setIsLiked(!isLiked)}
-                    className="flex-1 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300 group"
-                  >
-                    <Heart size={18} className={`mx-auto transition-all ${isLiked ? 'fill-red-500 text-red-500' : 'group-hover:scale-110'}`} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      const url = window.location.href;
-                      navigator.clipboard.writeText(url);
-                      alert('Link copied!');
-                    }}
-                    className="flex-1 p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-[#00d84a]/10 hover:text-[#00d84a] transition-all duration-300 group"
-                  >
-                    <Share2 size={18} className="mx-auto group-hover:scale-110 transition-transform" />
-                  </button>
                 </div>
               </div>
             </div>
