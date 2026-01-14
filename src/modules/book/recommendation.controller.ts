@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { RecommendationService } from './recommendation.service';
 import dbConnect from '@/lib/dbConnect';
 import { verifyToken } from '@/lib/jwt';
+import { getRecommendations } from './recommendation.service';
 
 const getPersonalizedRecommendations = async (req: Request) => {
   try {
@@ -11,20 +11,31 @@ const getPersonalizedRecommendations = async (req: Request) => {
     const token = authHeader?.split(' ')[1];
     
     let userId = "";
+
     if (token) {
-      const decoded = verifyToken(token);
-      if (decoded) userId = decoded.id;
+      try {
+        const decoded = verifyToken(token);
+        if (decoded && typeof decoded !== 'string') {
+          userId = decoded.id; 
+        }
+      } catch (tokenError) {
+        console.error("Token verification failed, defaulting to popular books.");
+      }
     }
 
-    const result = await RecommendationService.getRecommendations(userId);
+    const result = await getRecommendations(userId);
 
     return NextResponse.json({
       success: true,
-      message: "Recommendations fetched successfully!",
+      message: "Personalized recommendations fetched successfully!",
       data: result
     });
+
   } catch (err: any) {
-    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+    return NextResponse.json({ 
+      success: false, 
+      message: err.message || "Internal Server Error" 
+    }, { status: 400 });
   }
 };
 

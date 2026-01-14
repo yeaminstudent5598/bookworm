@@ -7,24 +7,32 @@ const getDashboardStats = async (req: Request) => {
   try {
     await dbConnect();
     
-    // টোকেন চেক
-    const token = req.headers.get('authorization')?.split(' ')[1];
-    if (!token) throw new Error("Unauthorized! Token missing.");
+    const authHeader = req.headers.get('authorization');
+    const token = authHeader?.split(' ')[1];
+    
+    if (!token) {
+      return NextResponse.json({ success: false, message: "Unauthorized! Login required." }, { status: 401 });
+    }
 
     const decoded = verifyToken(token);
-    if (!decoded) throw new Error("Invalid session. Please login again.");
+    if (!decoded || typeof decoded === 'string') {
+      return NextResponse.json({ success: false, message: "Invalid session. Please login again." }, { status: 401 });
+    }
 
-    // ডাটা ফেচ
     const result = await DashboardService.getUserDashboardStatsFromDB(decoded.id);
     
     return NextResponse.json({
       success: true,
-      message: "Dashboard data synced successfully!",
+      message: "Dashboard stats synced successfully!",
       data: result
     });
+
   } catch (err: any) {
-    console.error("🚩 Backend Dashboard Error:", err.message);
-    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+    console.error("🚩 Dashboard Controller Error:", err.message);
+    return NextResponse.json({ 
+      success: false, 
+      message: err.message || "Failed to fetch dashboard data" 
+    }, { status: 400 });
   }
 };
 
