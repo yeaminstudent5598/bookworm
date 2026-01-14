@@ -35,7 +35,7 @@ async function fetchBook(id: string) {
     }
 
     const data = await res.json();
-    console.log('✅ Book data fetched successfully');
+    console.log('  Book data fetched successfully');
     
     return data;
   } catch (error) {

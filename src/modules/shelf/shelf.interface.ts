@@ -4,5 +4,5 @@ export interface IShelf {
   user: Types.ObjectId | string;
   book: Types.ObjectId | string;
   status: 'Want to Read' | 'Currently Reading' | 'Read';
-  progress: number; // For "Currently Reading" (0-100)
+  progress: number; 
 }

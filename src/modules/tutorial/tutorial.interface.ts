@@ -1,5 +1,5 @@
 export interface ITutorial {
   title: string;
-  videoUrl: string; // YouTube Link
+  videoUrl: string; 
   description?: string;
 }

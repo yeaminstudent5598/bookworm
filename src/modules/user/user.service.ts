@@ -16,11 +16,10 @@ const getMyProfileFromDB = async (email: string) => {
   return await User.findOne({ email, isDeleted: false }).populate('preferences');
 };
 
-// ✅ Secure method: Get user by ID from JWT token
 const getMyProfileByIDFromDB = async (id: string) => {
   return await User.findOne({ _id: id, isDeleted: false })
-    .select('-password')  // Exclude password field
-    .populate('preferences');  // Include preferences if needed
+    .select('-password') 
+    .populate('preferences');  
 };
 
 const getUserGrowthStats = async () => {

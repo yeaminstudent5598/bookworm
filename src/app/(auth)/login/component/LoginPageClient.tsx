@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Mail, Eye, EyeOff, ArrowRight, BookOpen, Loader2 } from "lucide-react";
-import { setCookie } from "cookies-next"; // কুকি সেট করার জন্য
+import { setCookie } from "cookies-next";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,22 +22,17 @@ export default function LoginPageClient() {
       const result = res.data;
 
       if (result.success) {
-        // ১. এক্সেস টোকেন কুকিতে সেট করা
         setCookie("accessToken", result.data.accessToken);
         
-        // ২. 🔥 এই লাইনটি মিসিং ছিল: রোল কুকিতে সেট করা (মিডলওয়্যার এটি চেক করবে)
         setCookie("role", result.data.user.role);
 
-        // লোকাল স্টোরেজেও রাখা (ক্লায়েন্ট সাইড লজিকের জন্য)
         localStorage.setItem("accessToken", result.data.accessToken);
         localStorage.setItem("role", result.data.user.role);
 
-        // ৩. রোল অনুযায়ী সঠিক পেজে রিডাইরেক্ট
         const targetPath = result.data.user.role === "admin" 
           ? "/admin/dashboard" 
           : "/my-library";
         
-        // রাউটার রিফ্রেশ করা যাতে মিডলওয়্যার নতুন কুকি পায়
         router.refresh();
         router.push(targetPath);
       }

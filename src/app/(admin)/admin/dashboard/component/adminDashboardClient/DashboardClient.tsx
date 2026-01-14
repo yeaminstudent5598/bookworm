@@ -8,9 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// ============================================================
 // TYPES
-// ============================================================
 interface DashboardData {
   totalBooks: number;
   totalUsers: number;

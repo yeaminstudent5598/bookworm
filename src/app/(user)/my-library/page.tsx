@@ -1,6 +1,3 @@
-// app/(user)/my-library/page.tsx
-import { ReactNode } from 'react';
-import { redirect } from 'next/navigation';
 import LibraryClient from './library-client';
 
 interface Props {
@@ -22,7 +19,7 @@ async function fetchUserLibrary(token: string) {
         'Authorization': `Bearer ${token}`
       },
       next: {
-        revalidate: 60, // ISR: প্রতি মিনিটে revalidate
+        revalidate: 60,
         tags: ['user-library']
       }
     });
@@ -33,7 +30,7 @@ async function fetchUserLibrary(token: string) {
     }
 
     const data = await res.json();
-    console.log('✅ Library data fetched:', {
+    console.log('  Library data fetched:', {
       reading: data.data?.currentlyReading?.length,
       wantToRead: data.data?.wantToRead?.length,
       read: data.data?.read?.length

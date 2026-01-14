@@ -4,7 +4,7 @@ import dbConnect from '@/lib/dbConnect';
 
 const getAdminStats = async () => {
   try {
-    await dbConnect(); // ডাটাবেস কানেকশন নিশ্চিত করা
+    await dbConnect();
     const result = await StatsService.getAdminStatsFromDB();
     
     return NextResponse.json({

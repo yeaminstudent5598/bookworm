@@ -25,7 +25,6 @@ const TutorialsClient = () => {
   const [selectedVideo, setSelectedVideo] = useState<ITutorial | null>(null);
   const [error, setError] = useState<string | null>(null);
   
-  // ✅ প্যাগিনেশন স্টেট
   const [currentPage, setCurrentPage] = useState(1);
   const [meta, setMeta] = useState({ totalPages: 1, total: 0 });
 
@@ -56,11 +55,9 @@ const fetchTutorials = useCallback(async (query: string, page: number) => {
       });
 
       if (response.data.success) {
-        // ✅ ফিক্স: response.data.data এখন একটি অবজেক্ট, যার ভেতর আসল array-টি আছে 'data' নামে
         const fetchedData = response.data.data.data; 
         const fetchedMeta = response.data.data.meta;
 
-        // নিশ্চিত হচ্ছি যে এটি একটি Array
         setTutorials(Array.isArray(fetchedData) ? fetchedData : []);
         setMeta(fetchedMeta || { totalPages: 1, total: 0 });
       }
@@ -140,7 +137,6 @@ const fetchTutorials = useCallback(async (query: string, page: number) => {
               ))}
             </div>
 
-            {/* ✅ প্রফেশনাল প্যাগিনেশন UI */}
             {meta.totalPages > 1 && (
               <div className="flex justify-center items-center gap-3">
                 <button 

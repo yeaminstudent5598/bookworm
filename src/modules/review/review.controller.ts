@@ -4,13 +4,11 @@ import { ReviewValidation } from './review.validation';
 import dbConnect from '@/lib/dbConnect';
 import { verifyToken } from '@/lib/jwt';
 
-// ১. রিভিউ তৈরি করা (User Role)
 const createReview = async (req: Request) => {
   try {
     await dbConnect(); //
     const body = await req.json();
     
-    // টোকেন থেকে ইউজার আইডি বের করা (Security Best Practice)
     const authHeader = req.headers.get('authorization');
     const token = authHeader?.split(' ')[1];
     
@@ -19,14 +17,12 @@ const createReview = async (req: Request) => {
     const decodedUser = verifyToken(token);
     if (!decodedUser) throw new Error("Invalid session. Please login again.");
 
-    // বডিতে 'user' এবং 'book' কি-গুলো নিশ্চিত করা (Zod Match করার জন্য)
     const reviewData = {
       ...body,
-      user: decodedUser.id, // টোকেন থেকে আইডি নেওয়া হলো
-      book: body.bookId     // ফ্রন্টএন্ড থেকে আসা bookId কে book এ ম্যাপ করা হলো
+      user: decodedUser.id, 
+      book: body.bookId   
     };
 
-    // ভ্যালিডেশন
     const validatedData = ReviewValidation.createReviewSchema.parse(reviewData);
     const result = await ReviewService.createReviewInDB(validatedData);
     
@@ -39,17 +35,14 @@ const createReview = async (req: Request) => {
   }
 };
 
-// ২. সব রিভিউ দেখা (Admin Role Only)
 const getAllReviews = async (req: Request) => {
   try {
     await dbConnect(); //
     
-    // Admin Check
     const authHeader = req.headers.get('authorization');
     const token = authHeader?.split(' ')[1];
     const decoded = verifyToken(token || "");
 
-    // 🚩 ডিবাগ করার জন্য এই লগটি আপনার টার্মিনালে চেক করুন
     console.log("🛠️ Admin Access Request by Role:", decoded?.role);
 
     if (!decoded || decoded.role !== 'admin') {
@@ -84,7 +77,6 @@ const approveReview = async (req: Request, id: string) => {
   }
 };
 
-// ৪. রিভিউ ডিলিট করা (Admin Role Only)
 const deleteReview = async (id: string) => {
   try {
     await dbConnect(); //

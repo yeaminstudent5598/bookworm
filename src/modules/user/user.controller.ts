@@ -33,7 +33,6 @@ const deleteUser = async (id: string) => {
   }
 };
 
-// Old method (keeping for backward compatibility if needed)
 const getMyProfile = async (req: Request) => {
   try {
     const { searchParams } = new URL(req.url);
@@ -50,7 +49,6 @@ const getMyProfile = async (req: Request) => {
   }
 };
 
-// ✅ New secure method using user ID from JWT token
 const getMyProfileById = async (userId: string) => {
   try {
     await dbConnect();

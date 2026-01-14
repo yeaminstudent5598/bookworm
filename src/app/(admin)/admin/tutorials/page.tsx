@@ -9,7 +9,6 @@ async function getTutorials() {
     
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bookworm-xi-blond.vercel.app';
 
-    // এপিআই কল
     const res = await fetch(`${baseUrl}/api/v1/admin/tutorials`, {
       cache: 'no-store',
       headers: {
@@ -20,7 +19,6 @@ async function getTutorials() {
     if (!res.ok) throw new Error('Failed to fetch tutorials');
 
     const result = await res.json();
-    // কন্ট্রোলার থেকে আসা ডাটা এরি রিটার্ন করা
     return result.success ? result.data : [];
   } catch (error: any) {
     console.error('❌ Server Fetch Error:', error.message);

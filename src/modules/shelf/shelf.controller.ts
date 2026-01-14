@@ -5,7 +5,6 @@ import { ShelfValidation } from './shelf.validation';
 const updateShelfStatus = async (req: Request) => {
   try {
     const body = await req.json();
-    // Zod Validation
     const validatedData = ShelfValidation.updateShelfSchema.parse(body);
     
     const result = await ShelfService.updateShelfStatusInDB(validatedData);
@@ -22,7 +21,7 @@ const updateShelfStatus = async (req: Request) => {
 const getMyShelves = async (req: Request) => {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId'); // Ekhon Postman-er jonno query parameter use kora hoyeche
+    const userId = searchParams.get('userId');
 
     if (!userId) {
       throw new Error('User ID is required in query params');

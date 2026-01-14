@@ -8,7 +8,6 @@ const createBookInDB = async (payload: any) => await Book.create(payload);
 const getAllBooksFromDB = async (query: any) => {
   const { searchTerm, genre, sort, rating, page = 1, limit = 12 } = query;
   
-  // ১. ফিল্টার তৈরি করা
   let filter: any = { isDeleted: false };
 
   if (searchTerm) {
@@ -28,13 +27,11 @@ const getAllBooksFromDB = async (query: any) => {
     filter.averageRating = Number(rating); 
   }
 
-  // ২. ডাইনামিক সর্টিং কন্ডিশন
   let sortCondition: any = { createdAt: -1 }; // Default: Newest
   if (sort === 'Top Rated') sortCondition = { averageRating: -1 };
   else if (sort === 'Popular') sortCondition = { totalReviews: -1 };
   else if (sort === 'Oldest') sortCondition = { createdAt: 1 };
 
-  // ৩. প্যাগিনেশন লজিক
   const skip = (Number(page) - 1) * Number(limit);
 
   const result = await Book.find(filter)
@@ -43,7 +40,6 @@ const getAllBooksFromDB = async (query: any) => {
     .skip(skip)
     .limit(Number(limit));
 
-  // মোট বইয়ের সংখ্যা (ফ্রন্টএন্ড প্যাগিনেশনের জন্য)
   const total = await Book.countDocuments(filter);
 
   return {

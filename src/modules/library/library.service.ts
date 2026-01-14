@@ -5,18 +5,15 @@ const updateLibraryInDB = async (userId: string, payload: any) => {
   const { bookId, currentPage, totalPages, status } = payload;
   let updateData: any = { status };
 
-  // ১. স্ট্যাটাস অনুযায়ী ডাটা সেট করা
   if (status === 'Want to Read') {
     updateData.currentPage = 0;
     updateData.progress = 0;
   } 
   else if (status === 'Read') {
-    // যদি সরাসরি 'Mark as Finished' দেয়
     updateData.currentPage = totalPages || 0;
     updateData.progress = 100;
   }
 
-  // ২. প্রগ্রেস ক্যালকুলেশন (Currently Reading মোডে)
   if (currentPage !== undefined) {
     updateData.currentPage = Number(currentPage);
     if (totalPages) {
@@ -24,10 +21,8 @@ const updateLibraryInDB = async (userId: string, payload: any) => {
     }
   }
 
-  // ৩. ডাইনামিক স্ট্রিক আপডেট করা (Requirement)
   await updateStreak(userId);
 
-  // ৪. ডাটাবেস আপডেট
   return await Library.findOneAndUpdate(
     { user: userId, book: bookId },
     { $set: updateData },
@@ -40,7 +35,6 @@ const getMyCategorizedLibraryFromDB = async (userId: string) => {
     .populate('book')
     .sort({ updatedAt: -1 });
 
-  // স্ট্যাটাস অনুযায়ী আলাদা করে পাঠানো
   return {
     currentlyReading: libraryItems.filter(item => item.status === 'Currently Reading'),
     wantToRead: libraryItems.filter(item => item.status === 'Want to Read'),

@@ -9,7 +9,7 @@ import {
   ShieldCheck, PlayCircle, X, ChevronRight, 
   LogOut, Menu, Loader2
 } from 'lucide-react';
-import { logout } from "@/app/actions/auth"; // সার্ভার অ্যাকশন ইমপোর্ট
+import { logout } from "@/app/actions/auth";
 
 const menuItems = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutGrid },
@@ -47,14 +47,13 @@ export function AdminSidebar() {
 
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
-  // Navbar এর মতো সরাসরি Logout লজিক
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
       localStorage.removeItem("accessToken");
       localStorage.removeItem("role");
       localStorage.removeItem("userData");
-      await logout(); // সার্ভার থেকে কুকি ডিলিট করবে
+      await logout();
     } catch (error: any) {
       if (error.message === "NEXT_REDIRECT") return;
     } finally {

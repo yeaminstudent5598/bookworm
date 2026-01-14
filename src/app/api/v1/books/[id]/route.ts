@@ -1,6 +1,5 @@
 import { BookController } from '@/modules/book/book.controller';
 
-// Next.js 15+ এ params একটি Promise, তাই await করতে হবে
 export async function GET(
   req: Request, 
   { params }: { params: Promise<{ id: string }> }

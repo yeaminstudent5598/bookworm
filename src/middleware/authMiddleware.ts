@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 
 export const authGuard = async (req: Request) => {
@@ -15,5 +14,5 @@ export const authGuard = async (req: Request) => {
     throw new Error('Invalid or expired token!');
   }
 
-  return decoded; // Ekhane user information (email, role) thakbe
+  return decoded;
 };

@@ -5,5 +5,5 @@ export interface IReview {
   book: Types.ObjectId | string;
   rating: number; // 1-5
   comment: string;
-  status: 'pending' | 'approved'; // Admin moderate korbe
+  status: 'pending' | 'approved'; 
 }

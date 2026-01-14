@@ -7,9 +7,9 @@ import Link from "next/link";
 import axios from "axios";
 
 export default function ProfileClient() {
-  const [userData, setUserData] = useState<any>(null); // ডাটাবেস থেকে আসা ইউজার ডাটা
-  const [loading, setLoading] = useState(true); // পেজ লোডিং
-  const [updateLoading, setUpdateLoading] = useState(false); // পাসওয়ার্ড আপডেট লোডিং
+  const [userData, setUserData] = useState<any>(null); 
+  const [loading, setLoading] = useState(true); 
+  const [updateLoading, setUpdateLoading] = useState(false); 
   const [message, setMessage] = useState({ type: "", text: "" });
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
@@ -17,7 +17,6 @@ export default function ProfileClient() {
     confirmPassword: "",
   });
 
-  // API থেকে ইউজারের আসল প্রোফাইল ডাটা ফেচ করা
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -29,7 +28,7 @@ export default function ProfileClient() {
         });
 
         if (res.data.success) {
-          setUserData(res.data.data); // ডাটাবেসের ডাটা সেট করা
+          setUserData(res.data.data);
         }
       } catch (err) {
         console.error("Profile fetch error:", err);

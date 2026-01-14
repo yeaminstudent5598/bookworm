@@ -1,4 +1,3 @@
-// src/app/(user)/tutorials/page.tsx
 import TutorialsClient from './TutorialsClient';
 
 export const metadata = {

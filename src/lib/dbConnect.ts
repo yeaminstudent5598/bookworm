@@ -6,7 +6,6 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
 }
 
-// Global ক্যাশ অবজেক্ট তৈরি করা যাতে কানেকশন একবারই হয়
 let cached = (global as any).mongoose;
 
 if (!cached) {
@@ -20,7 +19,7 @@ async function dbConnect() {
 
   if (!cached.promise) {
     const opts = {
-      bufferCommands: false, // এটি টাইম-আউট এরর কমাতে সাহায্য করবে
+      bufferCommands: false,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {

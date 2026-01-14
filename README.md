@@ -89,7 +89,7 @@ The application features:
 - Delete genres (with book count validation)
 - Organize book categories
 
-#### ✅ Review Moderation
+####   Review Moderation
 - View all pending reviews
 - Approve reviews to make public
 - Delete inappropriate reviews

@@ -4,7 +4,6 @@ import { BookValidation } from './book.validation';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import dbConnect from '@/lib/dbConnect';
 
-// নতুন বই তৈরি করা
 const createBook = async (req: Request) => {
   try {
     await dbConnect();

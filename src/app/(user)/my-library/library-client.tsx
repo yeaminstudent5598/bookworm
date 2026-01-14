@@ -63,7 +63,7 @@ const LibraryClient = () => {
       });
 
       if (res.data.success) {
-        console.log('✅ Library loaded:', res.data.data);
+        console.log('Library loaded:', res.data.data);
         setLibrary(res.data.data);
       }
     } catch (err) {

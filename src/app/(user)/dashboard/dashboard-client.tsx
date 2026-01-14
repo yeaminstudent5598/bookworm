@@ -1,7 +1,3 @@
-// ============================================
-// FILE: app/(user)/dashboard/dashboard-client.tsx
-// ============================================
-
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -288,7 +284,7 @@ const ChartsSection: React.FC<ChartsSectionProps> = ({ charts }) => (
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
             />
-            <span className="text-gray-400">{genre.name}</span>
+            <span className="text-white">{genre.name}</span>
           </div>
         ))}
       </div>

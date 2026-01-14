@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { DashboardClient } from './component/adminDashboardClient/DashboardClient';
@@ -14,13 +13,11 @@ async function getDashboardData() {
     const token = cookieStore.get('accessToken')?.value;
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bookworm-xi-blond.vercel.app';
 
-    // ১. স্ট্যাটাস এবং অ্যাক্টিভিটি ফেচ
     const statsRes = await fetch(`${baseUrl}/api/v1/admin/stats`, {
       cache: 'no-store',
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    // ২. ইউজার গ্রোথ ফেচ
     const growthRes = await fetch(`${baseUrl}/api/v1/admin/user-growth`, {
       cache: 'no-store',
       headers: { Authorization: `Bearer ${token}` }

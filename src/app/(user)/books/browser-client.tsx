@@ -50,7 +50,7 @@ const BrowseLibraryClient = ({
   initialRating = 1,
   initialSort = 'Top Rated'
 }: BrowseClientProps) => {
-  // ✅ ALL HOOKS AT TOP
+  //   ALL HOOKS AT TOP
   const [books, setBooks] = useState<IBook[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,10 +65,10 @@ const BrowseLibraryClient = ({
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [genresLoading, setGenresLoading] = useState(true);
   
-  // ✅ NEW: Mobile filter panel state
+  //   NEW: Mobile filter panel state
   const [showFilters, setShowFilters] = useState(false);
 
-  // ✅ Fetch genres on mount
+  //   Fetch genres on mount
   useEffect(() => {
     const fetchGenres = async () => {
       try {
@@ -85,7 +85,7 @@ const BrowseLibraryClient = ({
     fetchGenres();
   }, []);
 
-  // ✅ Fetch books with filters
+  //   Fetch books with filters
   const fetchBooks = useCallback(async () => {
     try {
       setLoading(true);
@@ -137,17 +137,17 @@ const BrowseLibraryClient = ({
     }
   }, [searchTerm, ratingRange, selectedGenres, sortBy, currentPage]);
 
-  // ✅ Fetch books when filters change
+  //   Fetch books when filters change
   useEffect(() => {
     fetchBooks();
   }, [fetchBooks]);
 
-  // ✅ Reset page when filters change
+  //   Reset page when filters change
   const handleFilterChange = () => {
     setCurrentPage(1);
   };
 
-  // ✅ Update shelf status
+  //   Update shelf status
   const handleShelfUpdate = async (bookId: string, status: 'Want to Read' | 'Currently Reading' | 'Read') => {
     try {
       const token = localStorage.getItem('accessToken');
@@ -163,7 +163,7 @@ const BrowseLibraryClient = ({
     }
   };
 
-  // ✅ Show skeleton while initial loading
+  //   Show skeleton while initial loading
   if (loading && books.length === 0) {
     return <BooksBrowseSkeleton />;
   }
@@ -172,7 +172,7 @@ const BrowseLibraryClient = ({
     <div className="min-h-screen bg-gradient-to-b from-[#0a1410] via-[#081309] to-[#0a1410] text-white">
       <div className="flex flex-col lg:flex-row">
         
-        {/* ✅ SIDEBAR - Desktop Only */}
+        {/*   SIDEBAR - Desktop Only */}
         <aside className="hidden lg:block w-72 p-8 border-r border-white/5 bg-[#0a1410] space-y-8 sticky top-0 h-screen overflow-y-auto">
           <h2 className="text-2xl font-serif font-bold">Filters</h2>
 
@@ -251,7 +251,7 @@ const BrowseLibraryClient = ({
           </div>
         </aside>
 
-        {/* ✅ MOBILE FILTER PANEL - Sliding Overlay */}
+        {/*   MOBILE FILTER PANEL - Sliding Overlay */}
         {showFilters && (
           <div 
             className="lg:hidden fixed inset-0 bg-black/80 z-50 backdrop-blur-sm"
@@ -357,7 +357,7 @@ const BrowseLibraryClient = ({
           </div>
         )}
 
-        {/* ✅ MAIN CONTENT */}
+        {/*   MAIN CONTENT */}
         <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-12 space-y-6 md:space-y-10">
           
           {/* Header & Controls */}
@@ -407,7 +407,7 @@ const BrowseLibraryClient = ({
                 />
               </div>
 
-              {/* ✅ Mobile Filter Toggle Button */}
+              {/*   Mobile Filter Toggle Button */}
               <button
                 onClick={() => setShowFilters(true)}
                 className="lg:hidden flex items-center gap-2 px-3 sm:px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
@@ -417,7 +417,7 @@ const BrowseLibraryClient = ({
               </button>
             </div>
 
-            {/* ✅ Active Filters Pills */}
+            {/*   Active Filters Pills */}
             {(selectedGenres.length > 0 || ratingRange > 1) && (
               <div className="flex flex-wrap gap-2">
                 {selectedGenres.map((genreId) => {
@@ -458,7 +458,7 @@ const BrowseLibraryClient = ({
             )}
           </div>
 
-          {/* ✅ Books Grid - Fully Responsive */}
+          {/*   Books Grid - Fully Responsive */}
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {books.map((book) => (
               <BookCard
@@ -482,7 +482,7 @@ const BrowseLibraryClient = ({
             </div>
           )}
 
-          {/* ✅ Improved Pagination - Mobile Friendly */}
+          {/*   Improved Pagination - Mobile Friendly */}
           {meta.totalPages > 1 && (
             <div className="flex flex-col items-center gap-4 pt-8 sm:pt-12 border-t border-white/5">
               <div className="flex items-center gap-1 sm:gap-2">
@@ -571,9 +571,7 @@ const BrowseLibraryClient = ({
   );
 };
 
-/**
- * ✅ Book Card Component - Mobile Optimized
- */
+  
 interface BookCardProps {
   book: IBook;
   onAddToShelf: (bookId: string, status: 'Want to Read' | 'Currently Reading' | 'Read') => Promise<void>;

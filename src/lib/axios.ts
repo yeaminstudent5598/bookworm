@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// আপনার ব্যাকএন্ড এপিআই ইউআরএল
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
 
 const api = axios.create({

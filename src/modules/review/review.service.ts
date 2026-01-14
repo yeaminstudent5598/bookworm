@@ -7,26 +7,23 @@ import mongoose from 'mongoose';
 const createReviewInDB = async (payload: any) => await Review.create(payload);
 
 const getAllReviewsFromDB = async (status: string) => {
-  // মঙ্গুস যেন নিশ্চিতভাবে মডেলগুলো পায় তার জন্য একবার কল করা (Safety check)
   const models = { User, Book }; 
 
   return await Review.find({ status })
     .populate({
       path: 'user',
-      select: 'name photo email' // ইউজারের প্রয়োজনীয় তথ্য
+      select: 'name photo email'
     })
     .populate({
       path: 'book',
-      select: 'title author coverImage' // বইয়ের প্রয়োজনীয় তথ্য
+      select: 'title author coverImage'
     })
     .sort({ createdAt: -1 });
 };
 
 const updateReviewStatusInDB = async (id: string, status: string) => {
-  // ১. রিভিউ আপডেট করুন
   const updatedReview = await Review.findByIdAndUpdate(id, { status }, { new: true });
   
-  // ২. যদি অ্যাপ্রুভ হয়, তবে বইয়ের গড় রেটিং ক্যালকুলেট করুন
   if (status === 'approved' && updatedReview) {
     const bookId = updatedReview.book;
 

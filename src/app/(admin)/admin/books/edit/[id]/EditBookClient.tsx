@@ -27,7 +27,6 @@ interface EditBookClientProps {
   genres: Genre[];
 }
 
-// ✅ ১. স্কেলিটন কম্পোনেন্ট (Named Export)
 export function EditBookSkeleton() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-10 animate-pulse px-4">
@@ -46,7 +45,6 @@ export function EditBookSkeleton() {
   );
 }
 
-// ✅ ২. মেইন এডিট কম্পোনেন্ট (Named Export)
 export function EditBookClient({ bookId, initialBook, genres }: EditBookClientProps) {
   const router = useRouter();
   const [updating, setUpdating] = useState(false);
@@ -90,7 +88,7 @@ export function EditBookClient({ bookId, initialBook, genres }: EditBookClientPr
 
       const result = await response.json();
       if (result.success) {
-        alert("✅ Book updated successfully!");
+        alert("  Book updated successfully!");
         router.push('/admin/books');
         router.refresh();
       } else {

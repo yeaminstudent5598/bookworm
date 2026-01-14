@@ -20,11 +20,10 @@ export default function ReviewModerationClient({ initialReviews }: { initialRevi
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // ১. ডাটা ফেচ করার লজিক (ট্যাব অনুযায়ী)
   const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
-      setReviews([]); // ট্যাব পরিবর্তনের সময় পুরনো ডাটা মুছে ফেলা
+      setReviews([]); 
       
       const token = localStorage.getItem("accessToken");
       const res = await axios.get(`/api/v1/admin/reviews?status=${activeTab}`, {
@@ -45,7 +44,7 @@ export default function ReviewModerationClient({ initialReviews }: { initialRevi
     fetchReviews();
   }, [fetchReviews]);
 
-  // ২. রিভিউ একশন হ্যান্ডলার (Approve/Delete)
+  // ২. (Approve/Delete)
   const handleAction = async (id: string, action: 'approve' | 'delete') => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -55,7 +54,7 @@ export default function ReviewModerationClient({ initialReviews }: { initialRevi
         const res = await axios.patch(`/api/v1/admin/reviews/${id}`, { status: 'approved' }, config);
         if (res.data.success) {
           setSuccessMessage("Review has been approved and is now public.");
-          setShowSuccessModal(true); // 🔥 সাকসেস মোডাল শো করা
+          setShowSuccessModal(true);
         }
       } else {
         if (!window.confirm("Delete permanently?")) return;
@@ -63,7 +62,7 @@ export default function ReviewModerationClient({ initialReviews }: { initialRevi
       }
       
       fetchReviews(); 
-      router.refresh(); // সার্ভার ডাটা সিঙ্ক
+      router.refresh(); 
     } catch (err) {
       alert("Action failed!");
     }
@@ -209,7 +208,7 @@ export default function ReviewModerationClient({ initialReviews }: { initialRevi
         )}
       </div>
 
-      {/* --- ✅ Success Modal (image_c7d0cb style) --- */}
+      {/* ---   Success Modal (image_c7d0cb style) --- */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-[#1a140f] w-full max-w-sm rounded-[2.5rem] border border-white/10 p-10 text-center space-y-8 shadow-2xl relative">

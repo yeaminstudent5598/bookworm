@@ -4,10 +4,9 @@ import { AuthValidation } from './auth.validation';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import dbConnect from '@/lib/dbConnect';
 
-// src/modules/auth/auth.controller.ts
 const register = async (req: Request) => {
   try {
-    await dbConnect(); // ডাটাবেস কানেকশন কল করুন
+    await dbConnect(); 
 
     const formData = await req.formData();
     const file = formData.get('photo') as File;

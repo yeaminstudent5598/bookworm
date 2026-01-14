@@ -11,11 +11,9 @@ export async function GET() {
     const decoded = verifyToken(token!);
     const userId = (decoded as any).id;
 
-    // ১. রিডিং চ্যালেঞ্জ এবং স্ট্যাটস
     const shelfData = await Shelf.find({ user: userId });
     const readBooks = shelfData.filter(s => s.status === 'Read').length;
     
-    // ২. চার্ট ডাটা (সিম্পল লজিক)
     const genreStats = await Shelf.aggregate([
       { $match: { user: userId, status: 'Read' } },
       { $lookup: { from: 'books', localField: 'book', foreignField: '_id', as: 'bookInfo' } },
@@ -28,8 +26,8 @@ export async function GET() {
       data: {
         challenge: { current: readBooks, goal: 50 },
         stats: {
-          streak: 14, // এটি আপনি ইউজার মডেল থেকেও আনতে পারেন
-          totalPages: readBooks * 250, // এভারেজ হিসেব
+          streak: 14, 
+          totalPages: readBooks * 250, 
           readingTime: "45h 20m"
         },
         genreData: genreStats.map(g => ({ name: g._id, value: g.count }))

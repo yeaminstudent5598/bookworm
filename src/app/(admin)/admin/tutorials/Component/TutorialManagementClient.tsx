@@ -193,7 +193,6 @@ export default function TutorialManagementClient({ initialTutorials }: { initial
                       </div>
                       <div className="space-y-1 max-w-sm">
                         <span className="font-bold text-gray-100 text-base block leading-tight">{t.title}</span>
-                        {/* ডেসক্রিপশন এখন টেবিলে দৃশ্যমান */}
                         <p className="text-xs text-gray-600 line-clamp-2 italic">"{t.description || "No description provided."}"</p>
                       </div>
                     </div>
@@ -216,7 +215,7 @@ export default function TutorialManagementClient({ initialTutorials }: { initial
         </div>
       </div>
 
-      {/* 🟡 EDIT MODAL (Description সহ) */}
+      {/* EDIT MODAL */}
       {showEditModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-[#14110e] w-full max-w-lg rounded-[2.5rem] border border-[#2c1a10] p-10 shadow-3xl relative">
@@ -243,7 +242,7 @@ export default function TutorialManagementClient({ initialTutorials }: { initial
         </div>
       )}
 
-      {/* --- ✅ SUCCESS MODAL (Add/Edit/Delete) --- */}
+      {/* --- SUCCESS MODAL (Add/Edit/Delete) --- */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in">
           <div className="bg-[#1a140f] w-full max-w-sm rounded-[3rem] border border-white/10 p-10 text-center space-y-8 shadow-2xl relative">

@@ -1,5 +1,3 @@
-// app/(user)/dashboard/page.tsx
-import { ReactNode } from 'react';
 import DashboardClient from './dashboard-client';
 
 interface Props {
