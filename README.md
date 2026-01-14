@@ -292,7 +292,7 @@ REDIS_PASSWORD=your_redis_password
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/Yeamin-Madbor/bookworm.git
+git clone https://github.com/yeaminstudent5598/bookworm
 cd bookworm
 ```
 
@@ -710,8 +710,8 @@ Password: admin123456
 
 ### Sample User Account
 ```
-Email: user@bookworm.com
-Password: User@123456
+Email: pixelandcode07@gmail.com
+Password: user123456
 ```
 
 ---
@@ -785,7 +785,7 @@ Password: User@123456
 - **CORS Protection** - Configured for production domains
 - **Input Validation** - Zod schema validation on all inputs
 - **Rate Limiting** - Redis-based request throttling
-- **Email Verification** - Optional email verification flow
+- **Email Verification** - Optional Forgot Password
 - **Password Reset** - Secure token-based password recovery
 - **Role-Based Access** - Granular permission checking
 - **HTTPS Ready** - Optimized for secure deployment
@@ -963,18 +963,7 @@ Example commits:
 
 ---
 
-## 📞 Support & Contact
 
-For questions or issues:
-- **GitHub Issues:** [Open an issue](https://github.com/Yeamin-Madbor/bookworm/issues)
-- **Email:** yeamin@example.com
-- **LinkedIn:** [linkedin.com/in/yeamin-madbor](https://linkedin.com/in/yeamin-madbor)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
 
 ---
 
@@ -992,21 +981,9 @@ This project is licensed under the MIT License.
 
 **Yeamin Madbor**
 - Full Stack Web Developer
-- MERN & Next.js Specialist
-- GitHub: [@Yeamin-Madbor](https://github.com/Yeamin-Madbor)
-- LinkedIn: [linkedin.com/in/yeamin-madbor](https://linkedin.com/in/yeamin-madbor)
-
----
-
-## 🔗 Important Links
-
-| Resource | Link |
-|----------|------|
-| **Live Application** | https://bookworm-xi-blond.vercel.app |
-| **Client Repository** | https://github.com/Yeamin-Madbor/bookworm |
-| **Server Repository** | https://github.com/Yeamin-Madbor/bookworm-server |
-| **Project Requirements** | [View Document](https://programming-hero.com) |
-| **Submission Form** | https://forms.gle/uUxVTgP9Zq6ra3uY9 |
+- MERN & Next.js 
+- GitHub: [@Yeamin-Madbor](https://github.com/yeaminstudent5598)
+- LinkedIn: [linkedin.com/in/yeamin-madbor](https://www.linkedin.com/in/yeamin-madbor-83b3302b8/)
 
 ---
 
