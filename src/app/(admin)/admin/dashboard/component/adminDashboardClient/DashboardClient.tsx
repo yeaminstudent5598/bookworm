@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// TYPES
 interface DashboardData {
   totalBooks: number;
   totalUsers: number;
@@ -28,17 +27,44 @@ export function DashboardClient({ initialData, initialGrowth }: { initialData: a
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (initialData) {
-      setData({
-        totalBooks: initialData.totalBooks || 0,
-        totalUsers: initialData.totalUsers || 0,
-        pendingReviews: initialData.pendingReviews || 0,
-        genreStats: initialData.genreStats || [],
-        userGrowth: initialGrowth || [],
-        recentActivities: initialData.recentActivities || []
-      });
-      setLoading(false);
-    }
+    const fetchActiveReaders = async () => {
+      try {
+        const response = await fetch('/api/v1/admin/users', {
+          method: 'GET',
+          cache: 'no-store',
+        });
+
+        const usersData = await response.json();
+        const activeReaders = usersData.data?.filter((user: any) => user.role === 'user')?.length || 0;
+
+        if (initialData) {
+          setData({
+            totalBooks: initialData.totalBooks || 0,
+            totalUsers: activeReaders,
+            pendingReviews: initialData.pendingReviews || 0,
+            genreStats: initialData.genreStats || [],
+            userGrowth: initialGrowth || [],
+            recentActivities: initialData.recentActivities || []
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching active readers:', error);
+        if (initialData) {
+          setData({
+            totalBooks: initialData.totalBooks || 0,
+            totalUsers: initialData.totalUsers || 0,
+            pendingReviews: initialData.pendingReviews || 0,
+            genreStats: initialData.genreStats || [],
+            userGrowth: initialGrowth || [],
+            recentActivities: initialData.recentActivities || []
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActiveReaders();
   }, [initialData, initialGrowth]);
 
   if (loading) return <DashboardSkeleton />;
@@ -46,7 +72,6 @@ export function DashboardClient({ initialData, initialGrowth }: { initialData: a
   return (
     <div className="max-w-7xl mx-auto space-y-6 sm:space-y-10 animate-in fade-in duration-700 pb-10">
       
-      {/* 1. Header Section (Responsive) */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b border-white/5 pb-8">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -68,17 +93,14 @@ export function DashboardClient({ initialData, initialGrowth }: { initialData: a
         </Link>
       </div>
 
-      {/* 2. Stats Grid (Responsive stack to 3 cols) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <StatCard label="Cataloged Books" value={data?.totalBooks || 0} icon={<BookOpen size={22}/>} trend="+12%" color="green" />
         <StatCard label="Active Readers" value={data?.totalUsers || 0} icon={<UsersIcon size={22}/>} trend="+5%" color="blue" />
         <StatCard label="Pending Reviews" value={data?.pendingReviews || 0} icon={<MessageSquare size={22}/>} tag="Attention" color="orange" />
       </div>
 
-      {/* 3. Charts Section (Responsive Grid) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Genre Insights */}
         <div className="lg:col-span-5 bg-[#112216] p-6 sm:p-8 rounded-[2rem] border border-white/5 shadow-2xl space-y-8 h-full">
           <div className="flex justify-between items-center">
              <div className="space-y-1">
@@ -110,7 +132,6 @@ export function DashboardClient({ initialData, initialGrowth }: { initialData: a
           </div>
         </div>
 
-        {/* Growth Visualizer */}
         <div className="lg:col-span-7 bg-[#112216] p-6 sm:p-8 rounded-[2rem] border border-white/5 shadow-2xl relative overflow-hidden group h-full">
            <div className="absolute top-0 right-0 w-64 h-64 bg-[#22c55e]/5 blur-[100px] rounded-full -mr-32 -mt-32" />
            
@@ -137,7 +158,6 @@ export function DashboardClient({ initialData, initialGrowth }: { initialData: a
                     {item.month.slice(0,3)}
                  </span>
                  
-                 {/* Tooltip (Desktop Only for better UX) */}
                  <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-black text-[9px] font-black px-2.5 py-1.5 rounded-lg opacity-0 group-hover/bar:opacity-100 transition-all pointer-events-none whitespace-nowrap shadow-2xl z-10 hidden sm:block">
                    {item.count} Readers
                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45" />
@@ -148,7 +168,6 @@ export function DashboardClient({ initialData, initialGrowth }: { initialData: a
         </div>
       </div>
 
-      {/* 4. Activity Table (Scrollable on Mobile) */}
       <div className="bg-[#112216] rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
         <div className="p-6 sm:p-8 border-b border-white/5 flex justify-between items-center bg-black/20">
           <div className="flex items-center gap-3">
@@ -199,11 +218,9 @@ export function DashboardClient({ initialData, initialGrowth }: { initialData: a
   );
 }
 
-// --- Reusable Stat Card Component ---
 function StatCard({ label, value, icon, trend, tag, color }: any) {
   return (
     <div className="bg-[#112216] p-6 sm:p-8 rounded-[2rem] border border-white/5 hover:border-[#22c55e]/30 transition-all shadow-xl group relative overflow-hidden">
-      {/* Background Decor */}
       <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-white/5 rounded-full blur-2xl group-hover:bg-[#22c55e]/10 transition-colors" />
       
       <div className="flex justify-between items-start mb-6 relative z-10">
@@ -232,7 +249,6 @@ function StatCard({ label, value, icon, trend, tag, color }: any) {
   );
 }
 
-// --- Professional Dashboard Skeleton ---
 function DashboardSkeleton() {
   return (
     <div className="max-w-7xl mx-auto space-y-10 p-4 animate-pulse">
