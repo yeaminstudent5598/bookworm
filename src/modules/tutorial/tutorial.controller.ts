@@ -2,13 +2,25 @@ import { NextResponse } from 'next/server';
 import { TutorialService } from './tutorial.service';
 import dbConnect from '@/lib/dbConnect';
 
-const getAllTutorials = async () => {
+const getAllTutorials = async (req: Request) => {
   try {
     await dbConnect();
-    const result = await TutorialService.getAllTutorialsFromDB();
-    return NextResponse.json({ success: true, data: result });
+    
+    const { searchParams } = new URL(req.url);
+    const searchTerm = searchParams.get('searchTerm') || '';
+
+    const result = await TutorialService.getAllTutorialsFromDB(searchTerm);
+
+    return NextResponse.json({
+      success: true,
+      message: "Tutorials fetched successfully!",
+      data: result
+    });
   } catch (err: any) {
-    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+    return NextResponse.json({ 
+      success: false, 
+      message: err.message || "Something went wrong" 
+    }, { status: 400 });
   }
 };
 
