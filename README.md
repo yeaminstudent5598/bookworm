@@ -1,297 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookWorm README Generator</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .panel {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .panel-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .code-block {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            overflow-x: auto;
-            position: relative;
-            color: #333;
-        }
-
-        .code-block code {
-            display: block;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s;
-        }
-
-        .copy-btn:hover {
-            background: #764ba2;
-        }
-
-        .copy-btn.copied {
-            background: #4caf50;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100%;
-            border: none;
-            padding: 0;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            resize: none;
-            color: #333;
-        }
-
-        h2 {
-            color: #667eea;
-            margin: 20px 0 10px 0;
-            font-size: 16px;
-        }
-
-        h3 {
-            color: #764ba2;
-            margin: 15px 0 8px 0;
-            font-size: 14px;
-        }
-
-        p {
-            color: #666;
-            margin: 8px 0;
-            line-height: 1.6;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #667eea;
-            padding: 12px;
-            margin: 15px 0;
-            border-radius: 4px;
-            color: #1565c0;
-            font-size: 13px;
-        }
-
-        .success-msg {
-            display: none;
-            background: #4caf50;
-            color: white;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            animation: slideIn 0.3s ease;
-        }
-
-        .success-msg.show {
-            display: block;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 13px;
-        }
-
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        table th {
-            background: #f5f5f5;
-            font-weight: 600;
-        }
-
-        .preview {
-            line-height: 1.8;
-        }
-
-        .preview code {
-            background: #f5f5f5;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Preview Panel -->
-        <div class="panel">
-            <div class="panel-header">📖 Preview</div>
-            <div class="panel-content preview">
-                <div class="success-msg" id="successMsg">✓ কপি হয়েছে!</div>
-                
-                <h2>📚 BookWorm - Your Personal Cozy Library</h2>
-                <p><strong>BookWorm</strong> is a comprehensive digital library management system designed to provide a cozy and efficient reading experience. Built with the MERN stack and Next.js, it features role-based access, reading progress tracking, and personalized book recommendations.</p>
-
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
-
-                <h2>🚀 Live Demo & Links</h2>
-                <p>• <strong>Live URL:</strong> <code>https://bookworm-demo.vercel.app</code></p>
-                <p>• <strong>Client Repository:</strong> <code>https://github.com/Yeamin-Madbor/bookworm</code></p>
-                <p>• <strong>Server Repository:</strong> <code>https://github.com/Yeamin-Madbor/bookworm-server</code></p>
-
-                <h2>🔑 Admin Credentials (For Testing)</h2>
-                <div class="info-box">
-                    <strong>Email:</strong> <code>admin@bookworm.com</code><br>
-                    <strong>Password:</strong> <code>admin123456</code>
-                </div>
-
-                <h2>✨ Key Features</h2>
-                <h3>👤 User Features</h3>
-                <p>• <strong>Personalized Dashboard:</strong> Premium dark forest green dashboard with reading stats and progress charts.</p>
-                <p>• <strong>Reading Tracker:</strong> Manage books through "Want to Read", "Currently Reading", and "Read" shelves.</p>
-                <p>• <strong>Smart Recommendations:</strong> Book suggestions based on reading history and favorite genres.</p>
-                <p>• <strong>Community Feed:</strong> Stay updated with what other readers are adding or finishing.</p>
-                <p>• <strong>Tutorial Hub:</strong> Access curated YouTube video guides on literature and reading tips.</p>
-
-                <h3>🛡️ Admin Features</h3>
-                <p>• <strong>Library Management:</strong> Full CRUD operations for books, authors, and genres.</p>
-                <p>• <strong>Review Moderation:</strong> Approve or delete user reviews before they go public.</p>
-                <p>• <strong>User Management:</strong> View all registered users and manage roles (User to Admin).</p>
-                <p>• <strong>Advanced Analytics:</strong> Visualized stats using Recharts (Total books, users, and pending tasks).</p>
-
-                <h2>🛠️ Tech Stack</h2>
-                <p>• <strong>Frontend:</strong> Next.js 14+, TypeScript, Tailwind CSS, Framer Motion.</p>
-                <p>• <strong>Backend:</strong> Node.js, Express.js, Mongoose.</p>
-                <p>• <strong>Database:</strong> MongoDB Atlas.</p>
-                <p>• <strong>Authentication:</strong> JWT (JSON Web Tokens) with Role-Based Access Control (RBAC).</p>
-                <p>• <strong>Charts:</strong> Recharts for analytical visualization.</p>
-            </div>
-        </div>
-
-        <!-- Code Panel -->
-        <div class="panel">
-            <div class="panel-header">💻 README.md Code</div>
-            <div class="panel-content">
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="copyAllCode()">📋 Copy All Code</button>
-                    <button class="btn btn-secondary" onclick="downloadCode()">⬇️ Download</button>
-                </div>
-                <textarea id="codeArea" readonly></textarea>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const readmeContent = `# 📚 BookWorm - Your Personal Cozy Library
+# 📚 BookWorm - Your Personal Cozy Library
 
 **BookWorm** is a comprehensive digital library management system designed to provide a cozy and efficient reading experience. Built with the MERN stack and Next.js, it features role-based access, reading progress tracking, and personalized book recommendations.
 
 ---
 
 ## 🚀 Live Demo & Links
-- **Live URL:** https://bookworm-demo.vercel.app
-- **Client Repository:** https://github.com/Yeamin-Madbor/bookworm
-- **Server Repository:** https://github.com/Yeamin-Madbor/bookworm-server
+- **Live URL:** [https://bookworm-demo.vercel.app](https://bookworm-demo.vercel.app)
+- **Client Repository:** [https://github.com/Yeamin-Madbor/bookworm](https://github.com/Yeamin-Madbor/bookworm)
+- **Server Repository:** [https://github.com/Yeamin-Madbor/bookworm-server](https://github.com/Yeamin-Madbor/bookworm-server)
 
 ---
 
@@ -309,220 +25,537 @@
 - **Smart Recommendations:** Get book suggestions based on your reading history and favorite genres.
 - **Community Feed:** Stay updated with what other readers are adding or finishing.
 - **Tutorial Hub:** Access curated YouTube video guides on literature and reading tips.
+- **Book Reviews:** Leave detailed reviews and ratings for books you've read.
 
 ### 🛡️ Admin Features
 - **Library Management:** Full CRUD operations for books, authors, and genres.
 - **Review Moderation:** Approve or delete user reviews before they go public.
 - **User Management:** View all registered users and manage roles (User to Admin).
 - **Advanced Analytics:** Visualized stats using Recharts (Total books, users, and pending tasks).
+- **System Monitoring:** Track pending reviews and platform activity.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** Next.js 14+, TypeScript, Tailwind CSS, Framer Motion.
-- **Backend:** Node.js, Express.js, Mongoose.
-- **Database:** MongoDB Atlas.
-- **Authentication:** JWT (JSON Web Tokens) with Role-Based Access Control (RBAC).
-- **Charts:** Recharts for analytical visualization.
-- **Styling:** Custom "Cozy Library" Theme (Dark Green Palette).
+### Frontend
+- **Next.js 14+** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Framer Motion** - Animations and transitions
+- **Recharts** - Data visualizations
+
+### Backend
+- **Node.js** - JavaScript runtime
+- **Express.js** - Web framework
+- **Mongoose** - MongoDB object modeling
+
+### Database & Authentication
+- **MongoDB Atlas** - Cloud database
+- **JWT (JSON Web Tokens)** - Secure authentication
+- **Role-Based Access Control (RBAC)** - Permission management
 
 ---
 
 ## ⚙️ Environment Variables
-To run this project, add the following variables to your \`.env.local\` file:
 
-\`\`\`env
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
+To run this project, create a `.env.local` file in the root directory and add the following variables:
+
+```env
+# Database
+MONGODB_URI=your_mongodb_atlas_connection_string
+
+# Authentication
+JWT_SECRET=your_super_secret_jwt_key
+
+# API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
-\`\`\`
+API_BASE_URL=http://localhost:3000/api/v1
+
+# Environment
+NEXT_PUBLIC_ENVIRONMENT=development
+```
 
 ---
 
 ## 🏃 Getting Started
 
-### 1. Clone the repository:
-\`\`\`bash
+### Prerequisites
+- Node.js v18+ and npm/yarn installed
+- MongoDB Atlas account
+- Git installed
+
+### Installation Steps
+
+**1. Clone the repository:**
+```bash
 git clone https://github.com/Yeamin-Madbor/bookworm.git
 cd bookworm
-\`\`\`
+```
 
-### 2. Install dependencies:
-\`\`\`bash
+**2. Install dependencies:**
+```bash
 npm install
-\`\`\`
+# or
+yarn install
+```
 
-### 3. Configure environment variables:
-Create a \`.env.local\` file and add the variables mentioned above.
+**3. Configure environment variables:**
+Create a `.env.local` file and add the variables listed in the Environment Variables section above.
 
-### 4. Run the development server:
-\`\`\`bash
+**4. Run the development server:**
+```bash
 npm run dev
-\`\`\`
+# or
+yarn dev
+```
 
-### 5. Open in browser:
-Go to \`http://localhost:3000\`
+**5. Open in your browser:**
+Navigate to `http://localhost:3000`
 
 ---
 
 ## 📁 Project Structure
 
-\`\`\`
+```
 bookworm/
 ├── app/
-│   ├── api/                      # API routes
-│   ├── (dashboard)/              # Dashboard pages
-│   ├── (auth)/                   # Auth pages
-│   └── layout.tsx
+│   ├── api/                      # API routes (/api/v1)
+│   ├── (dashboard)/              # Dashboard routes (protected)
+│   ├── (auth)/                   # Authentication routes (login, register)
+│   ├── layout.tsx                # Root layout
+│   └── page.tsx                  # Home page
 ├── components/
 │   ├── shared/                   # Shared components
-│   ├── dashboard/                # Dashboard components
-│   └── ui/                       # UI components
+│   │   ├── Navbar.tsx
+│   │   ├── Sidebar.tsx
+│   │   └── Footer.tsx
+│   ├── dashboard/                # Dashboard-specific components
+│   │   ├── StatsCard.tsx
+│   │   ├── ReadingChart.tsx
+│   │   └── BookShelf.tsx
+│   └── ui/                       # Reusable UI components
+│       ├── Button.tsx
+│       ├── Card.tsx
+│       └── Modal.tsx
 ├── lib/
-│   ├── db.ts                     # Database connection
-│   ├── auth.ts                   # Auth logic
-│   └── validations.ts
+│   ├── db.ts                     # MongoDB connection
+│   ├── auth.ts                   # Authentication logic
+│   ├── validations.ts            # Zod schemas
+│   └── utils.ts                  # Utility functions
 ├── models/
-│   ├── User.ts
-│   ├── Book.ts
-│   ├── Review.ts
-│   └── Author.ts
-├── public/                       # Static assets
-├── .env.local                    # Environment variables
+│   ├── User.ts                   # User schema
+│   ├── Book.ts                   # Book schema
+│   ├── Review.ts                 # Review schema
+│   └── Author.ts                 # Author schema
+├── public/
+│   ├── images/
+│   └── icons/
+├── styles/
+│   ├── globals.css
+│   └── variables.css
+├── .env.local                    # Environment variables (create this)
+├── .gitignore
+├── next.config.js                # Next.js configuration
+├── tsconfig.json                 # TypeScript configuration
+├── tailwind.config.js            # Tailwind CSS configuration
 └── package.json
-\`\`\`
+```
 
 ---
 
-## 📚 API Endpoints
+## 📚 API Documentation
 
-### Authentication
-\`\`\`
+### Authentication Endpoints
+
+**Register User**
+```http
 POST /api/v1/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "SecurePassword123!"
+}
+```
+
+**Login User**
+```http
 POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePassword123!"
+}
+```
+
+**Get Profile**
+```http
 GET /api/v1/auth/profile
-POST /api/v1/auth/logout
-\`\`\`
+Authorization: Bearer {jwt_token}
+```
 
-### Books
-\`\`\`
-GET /api/v1/books                 # Get all books
-GET /api/v1/books/:id             # Get single book
-POST /api/v1/books                # Create book (Admin)
-PUT /api/v1/books/:id             # Update book (Admin)
-DELETE /api/v1/books/:id          # Delete book (Admin)
-\`\`\`
+### Books Endpoints
 
-### Reviews
-\`\`\`
-GET /api/v1/reviews/:bookId       # Get reviews for book
-POST /api/v1/reviews              # Create review
-PUT /api/v1/reviews/:id           # Update review
-DELETE /api/v1/reviews/:id        # Delete review
-\`\`\`
+**Get All Books**
+```http
+GET /api/v1/books
+```
 
-### Admin
-\`\`\`
-GET /api/v1/admin/dashboard       # Dashboard stats
-GET /api/v1/admin/users           # All users
-GET /api/v1/admin/reviews         # Pending reviews
-PUT /api/v1/admin/users/:id       # Update user role
-\`\`\`
+**Get Single Book**
+```http
+GET /api/v1/books/:id
+```
+
+**Create Book (Admin Only)**
+```http
+POST /api/v1/books
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "title": "The Great Gatsby",
+  "author": "F. Scott Fitzgerald",
+  "genre": "Fiction",
+  "description": "A classic American novel",
+  "coverImage": "https://...",
+  "publicationYear": 1925,
+  "pages": 180,
+  "isbn": "978-0-7432-7356-5"
+}
+```
+
+**Update Book (Admin Only)**
+```http
+PUT /api/v1/books/:id
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "title": "Updated Title",
+  "genre": "Classic Fiction"
+}
+```
+
+**Delete Book (Admin Only)**
+```http
+DELETE /api/v1/books/:id
+Authorization: Bearer {admin_token}
+```
+
+### Reviews Endpoints
+
+**Get Book Reviews**
+```http
+GET /api/v1/reviews/:bookId
+```
+
+**Create Review**
+```http
+POST /api/v1/reviews
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "bookId": "book_id",
+  "rating": 5,
+  "comment": "Amazing book!",
+  "readDate": "2024-01-10"
+}
+```
+
+**Update Review**
+```http
+PUT /api/v1/reviews/:id
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Great book"
+}
+```
+
+**Delete Review**
+```http
+DELETE /api/v1/reviews/:id
+Authorization: Bearer {token}
+```
+
+### Admin Endpoints
+
+**Get Dashboard Stats**
+```http
+GET /api/v1/admin/dashboard
+Authorization: Bearer {admin_token}
+```
+
+**Get All Users**
+```http
+GET /api/v1/admin/users
+Authorization: Bearer {admin_token}
+```
+
+**Get Pending Reviews**
+```http
+GET /api/v1/admin/reviews/pending
+Authorization: Bearer {admin_token}
+```
+
+**Approve Review**
+```http
+PUT /api/v1/admin/reviews/:id/approve
+Authorization: Bearer {admin_token}
+```
+
+**Change User Role**
+```http
+PUT /api/v1/admin/users/:id/role
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "role": "admin"
+}
+```
 
 ---
 
-## 🔐 Security
+## 🔒 Security Features
 
-- **JWT Authentication** - Secure token-based authentication
-- **Role-Based Access Control** - Fine-grained permissions
-- **Password Hashing** - bcrypt encryption
-- **Input Validation** - Zod schema validation
-- **CORS Protection** - Properly configured origins
+- **JWT Authentication** - Secure token-based authentication with expiration
+- **Password Hashing** - bcrypt for secure password storage
+- **Role-Based Access Control (RBAC)** - Fine-grained permission management
+- **Input Validation** - Zod schemas for data validation
+- **CORS Protection** - Properly configured cross-origin requests
+- **Rate Limiting** - Prevent API abuse
+- **HTTPS Only** - Enforced in production
+
+---
+
+## 📦 Dependencies
+
+```json
+{
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "mongoose": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "bcryptjs": "^2.4.3",
+    "tailwindcss": "^3.0.0",
+    "framer-motion": "^10.0.0",
+    "recharts": "^2.10.0",
+    "zod": "^3.22.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0",
+    "@types/node": "^20.0.0",
+    "tailwindcss": "^3.0.0"
+  }
+}
+```
+
+---
+
+## 🎨 Design Features
+
+- **Dark Forest Green Theme** - Eye-friendly cozy color palette
+- **Responsive Design** - Optimized for mobile, tablet, and desktop
+- **Smooth Animations** - Framer Motion for delightful interactions
+- **Modern UI** - Clean and intuitive interface
+- **Accessibility** - WCAG compliant with proper semantic HTML
+- **Fast Performance** - Optimized images and lazy loading
 
 ---
 
 ## 🚀 Deployment
 
-### Deploy to Vercel
-\`\`\`bash
-npm i -g vercel
-vercel
-\`\`\`
+### Deploy to Vercel (Recommended)
 
-Then add environment variables in Vercel dashboard:
-- MONGODB_URI
-- JWT_SECRET
-- NEXT_PUBLIC_API_URL
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Follow prompts and set environment variables in dashboard
+```
+
+### Environment Variables in Vercel Dashboard
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `NEXT_PUBLIC_API_URL`
+
+### Deploy to Other Platforms
+
+**Netlify:**
+```bash
+npm run build
+# Deploy the .next folder
+```
+
+**Docker:**
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
 
 ---
 
-## 🎨 Features Highlight
+## 📊 Key Features in Detail
 
-✨ **Dark Forest Green Theme** - Eye-friendly cozy design
-📱 **Fully Responsive** - Works on all devices
-⚡ **Fast Loading** - Optimized performance
-🎯 **User-Friendly** - Intuitive interface
-📊 **Advanced Analytics** - Recharts visualizations
-🔒 **Secure** - JWT + RBAC authentication
+### Reading Progress Tracking
+- Visual progress bars for each book
+- Percentage completion tracking
+- Reading time estimates
+- Reading streak counter
+- Completion certificates
+
+### Smart Recommendations
+- Collaborative filtering based on user history
+- Genre-based suggestions
+- Popular picks in favorite categories
+- Trending books this week
+- Personalized suggestions based on ratings
+
+### Community Features
+- Share reading milestones
+- Follow other readers
+- See what friends are reading
+- Participate in reading discussions
+- Create and join reading clubs
+
+### Analytics Dashboard
+- Total books in library
+- Total users on platform
+- Average reading time
+- Most popular books
+- Top-rated reviews
+- Pending moderation tasks
+
+---
+
+## 🧪 Testing
+
+### Running Tests
+```bash
+npm run test
+```
+
+### Test Coverage
+```bash
+npm run test:coverage
+```
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 🔗 Links
+
+| Link | URL |
+|------|-----|
+| **Live Demo** | https://bookworm-demo.vercel.app |
+| **Client Repo** | https://github.com/Yeamin-Madbor/bookworm |
+| **Server Repo** | https://github.com/Yeamin-Madbor/bookworm-server |
+| **Issues** | https://github.com/Yeamin-Madbor/bookworm/issues |
+| **Discussions** | https://github.com/Yeamin-Madbor/bookworm/discussions |
 
 ---
 
 ## 👨‍💻 Author
 
 **Yeamin Madbor**
-- Full Stack Web Developer | MERN Specialist
-- LinkedIn: https://linkedin.com/in/yeamin-madbor
-- GitHub: https://github.com/Yeamin-Madbor
-- Email: yeamin@example.com
+
+Full Stack Web Developer | MERN Specialist | Next.js Enthusiast
+
+- **LinkedIn:** [linkedin.com/in/yeamin-madbor](https://linkedin.com/in/yeamin-madbor)
+- **GitHub:** [@Yeamin-Madbor](https://github.com/Yeamin-Madbor)
+- **Portfolio:** [yeamin-madbor.vercel.app](https://yeamin-madbor.vercel.app)
+- **Email:** yeamin@example.com
 
 ---
 
 ## ❓ FAQ
 
 **Q: Is BookWorm free?**  
-A: Yes, completely free and open-source.
+A: Yes, BookWorm is completely free and open-source.
 
-**Q: Can I use this commercially?**  
-A: Yes, under MIT License with proper attribution.
+**Q: Can I use BookWorm for commercial purposes?**  
+A: Yes, under the MIT License with proper attribution.
+
+**Q: How often is BookWorm updated?**  
+A: Regular updates are released monthly with new features and improvements.
 
 **Q: How do I report bugs?**  
-A: Open an issue on GitHub with detailed information.
+A: Please open an issue on our GitHub repository with detailed information.
 
-**Q: How often is it updated?**  
-A: Regular updates monthly with new features.
+**Q: Can I contribute to the project?**  
+A: Yes! We welcome contributions. Please see the Contributing section below.
+
+**Q: What should I do if I forget my password?**  
+A: Use the "Forgot Password" link on the login page. A reset link will be sent to your email.
+
+**Q: Is my reading data private?**  
+A: Yes, your data is private and only visible to you unless you choose to share it.
 
 ---
 
-**Made with ❤️ for book lovers everywhere**`;
+## 🤝 Contributing
 
-        document.getElementById('codeArea').value = readmeContent;
+Contributions are welcome! Here's how to contribute:
 
-        function copyAllCode() {
-            const codeArea = document.getElementById('codeArea');
-            codeArea.select();
-            document.execCommand('copy');
-            
-            const msg = document.getElementById('successMsg');
-            msg.classList.add('show');
-            setTimeout(() => msg.classList.remove('show'), 2000);
-        }
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-        function downloadCode() {
-            const element = document.createElement('a');
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(readmeContent));
-            element.setAttribute('download', 'README.md');
-            element.style.display = 'none';
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-        }
-    </script>
-</body>
-</html>
+### Contribution Guidelines
+- Follow the existing code style
+- Write clear commit messages
+- Update documentation as needed
+- Test your changes before submitting
+
+---
+
+## 📞 Support
+
+For support, questions, or feedback:
+- **Email:** support@bookworm.com
+- **GitHub Issues:** [Open an issue](https://github.com/Yeamin-Madbor/bookworm/issues)
+- **GitHub Discussions:** [Start a discussion](https://github.com/Yeamin-Madbor/bookworm/discussions)
+
+---
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) - React framework
+- [MongoDB](https://www.mongodb.com/) - Database
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- [Recharts](https://recharts.org/) - Charts library
+- [Framer Motion](https://www.framer.com/motion/) - Animation library
+
+---
+
+**Made with ❤️ for book lovers everywhere**
+
+*Last updated: January 2024 | BookWorm v1.0.0*
+*Follow us on [Twitter](https://twitter.com) | [Facebook](https://facebook.com)*
