@@ -4,41 +4,64 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // 1️⃣ API রুটগুলোকে মিডলওয়্যার রিডাইরেক্ট লজিক থেকে পুরোপুরি বাদ দিন
-  // এতে আপনার 307 Redirect এরর সমাধান হবে
-  if (path.startsWith('/api')) {
+  // ১. এপিআই এবং স্ট্যাটিক ফাইলগুলো ফিল্টার করা
+  if (
+    path.startsWith('/api') || 
+    path.startsWith('/_next') || 
+    path.includes('/favicon.ico')
+  ) {
     return NextResponse.next();
   }
 
-  // 2️⃣ সঠিক কুকি নাম ব্যবহার করুন (accessToken)
+  // ২. কুকি থেকে ডাটা নেওয়া
   const accessToken = request.cookies.get('accessToken')?.value || '';
+  const userRole = request.cookies.get('role')?.value || ''; 
   const isAuthenticated = !!accessToken;
 
-  // 3️⃣ পাবলিক এবং প্রোটেক্টড রুট ডিফাইন করা
-  const isPublicPath = ['/login', '/register'].includes(path);
+  // ৩. পাবলিক পেজ লিস্ট
+  const publicPaths = [
+    '/login', 
+    '/register', 
+    '/forgot-password', 
+    '/reset-password'
+  ];
+  
+  const isPublicPath = publicPaths.includes(path);
   const isRootPath = path === '/';
 
-  // 4️⃣ রিডাইরেক্ট লজিক (শুধুমাত্র UI পেজগুলোর জন্য)
-  
-  // রুট পাথে থাকলে
+  // ৪. রিডাইরেক্ট লজিক
+
+  // ক) রুট পাথ (/) হ্যান্ডেল করা: লগইন না থাকলে লগইন পেজে, থাকলে রোল অনুযায়ী হোমে
   if (isRootPath) {
-    return NextResponse.redirect(new URL(isAuthenticated ? '/my-library' : '/login', request.nextUrl));
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL('/login', request.nextUrl));
+    }
+    const target = userRole === 'admin' ? '/admin/dashboard' : '/my-library';
+    return NextResponse.redirect(new URL(target, request.nextUrl));
   }
 
-  // যদি লগইন অবস্থায় লগইন/রেজিস্ট্রেশন পেজে যেতে চায়
+  // খ) লগইন অবস্থায় পাবলিক পেজে গেলে রিডাইরেক্ট
   if (isPublicPath && isAuthenticated) {
-    return NextResponse.redirect(new URL('/my-library', request.nextUrl));
+    const target = userRole === 'admin' ? '/admin/dashboard' : '/my-library';
+    return NextResponse.redirect(new URL(target, request.nextUrl));
   }
 
-  // যদি লগআউট অবস্থায় প্রটেক্টড পেজে যেতে চায়
+  // গ) লগআউট অবস্থায় প্রোটেক্টড পেজে এক্সেস বন্ধ করা
   if (!isPublicPath && !isAuthenticated) {
     return NextResponse.redirect(new URL('/login', request.nextUrl));
+  }
+
+  // ঘ) রোল প্রোটেকশন: সাধারণ ইউজার যেন অ্যাডমিন পেজে না যেতে পারে
+  if (path.startsWith('/admin') && userRole !== 'admin') {
+    return NextResponse.redirect(new URL('/my-library', request.nextUrl));
   }
 
   return NextResponse.next();
 }
 
-// static ফাইলগুলো বাদ দিয়ে সবখানে মিডলওয়্যার চলবে
+// ৫. ম্যাচিং কনফিগারেশন
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|public).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };

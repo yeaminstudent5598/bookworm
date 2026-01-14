@@ -82,4 +82,47 @@ const login = async (req: Request) => {
   }
 };
 
-export const AuthController = { register, login };
+
+const forgotPassword = async (req: Request) => {
+  try {
+    await dbConnect();
+    const { email } = await req.json();
+    const result = await AuthService.forgotPassword(email);
+    return NextResponse.json({ success: true, ...result });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+  }
+};
+
+const resetPassword = async (req: Request) => {
+  try {
+    await dbConnect();
+    const body = await req.json();
+    const result = await AuthService.resetPassword(body);
+    return NextResponse.json({ success: true, ...result });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+  }
+};
+
+
+const changePassword = async (req: Request) => {
+  try {
+    await dbConnect();
+    const body = await req.json();
+    const { userId, ...passwordData } = body; 
+
+    if (!userId) throw new Error("Unauthorized access!");
+
+    const result = await AuthService.changePassword(userId, passwordData);
+    
+    return NextResponse.json({ success: true, ...result });
+  } catch (err: any) {
+    return NextResponse.json(
+      { success: false, message: err.message || "Failed to change password" }, 
+      { status: 400 }
+    );
+  }
+};
+
+export const AuthController = { register, login, forgotPassword, resetPassword, changePassword };

@@ -2,6 +2,8 @@ import { User } from '../user/user.model';
 import { TLoginUser, TRegisterUser } from './auth.interface';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/lib/jwt';
+import { redis } from '@/lib/redis';
+import { sendEmail } from '@/lib/sendEmail';
 
 const registerUser = async (payload: TRegisterUser) => {
   // ১. ইমেইল চেক
@@ -43,4 +45,49 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
-export const AuthService = { registerUser, loginUser };
+
+
+const forgotPassword = async (email: string) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error('User not found!');
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  await redis.set(`otp:${email}`, otp, 'EX', 300);
+
+  await sendEmail(email, "Reset Your BookWorm Password", { otp });
+  return { message: "OTP sent to your email" };
+};
+
+const resetPassword = async (payload: any) => {
+  const { email, otp, newPassword } = payload;
+  const cachedOtp = await redis.get(`otp:${email}`);
+
+  if (!cachedOtp || cachedOtp !== otp) throw new Error('Invalid or expired OTP!');
+
+  const user = await User.findOne({ email });
+  if (!user) throw new Error('User not found!');
+
+  user.password = newPassword;
+  await user.save();
+  await redis.del(`otp:${email}`);
+
+  return { message: "Password reset successful" };
+};
+
+const changePassword = async (userId: string, payload: any) => {
+  const { oldPassword, newPassword } = payload;
+
+  const user = await User.findById(userId).select('+password');
+  if (!user) throw new Error('User not found!');
+
+  const isPasswordMatch = await bcrypt.compare(oldPassword, user.password!);
+  if (!isPasswordMatch) throw new Error('Old password does not match!');
+
+
+  user.password = newPassword;
+  await user.save();
+
+  return { message: "Password changed successfully!" };
+};
+
+export const AuthService = { registerUser,forgotPassword, resetPassword, loginUser, changePassword };

@@ -1,58 +1,47 @@
-import { UserController } from "@/modules/user/user.controller";
 import dbConnect from "@/lib/dbConnect";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { User } from "@/modules/user/user.model";
+// মডেল রেজিস্ট্রেশন এরর এড়াতে Genre মডেলটি সরাসরি ইমপোর্ট করুন
+import "@/modules/genre/genre.model"; 
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-interface TokenPayload {
-  id: string;
-  email: string;
-  role: string;
-}
 
 export async function GET(req: Request) {
   try {
     await dbConnect();
 
-    // Extract token from Authorization header
     const authHeader = req.headers.get('authorization');
-    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json(
-        { success: false, message: "Authorization token required" }, 
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
     const token = authHeader.split(' ')[1];
-
-    // Verify token and get user ID
-    let decoded: TokenPayload;
-    try {
-      decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
-    } catch (error) {
-      return NextResponse.json(
-        { success: false, message: "Invalid or expired token" }, 
-        { status: 401 }
-      );
-    }
     
-    if (!decoded || !decoded.id) {
-      return NextResponse.json(
-        { success: false, message: "Invalid token payload" }, 
-        { status: 401 }
-      );
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return NextResponse.json({ success: false, message: "Invalid Token" }, { status: 401 });
     }
 
-    // Fetch user profile by ID from token
-    return UserController.getMyProfileById(decoded.id);
+    // Genre মডেল ইমপোর্ট করায় এখন populate('preferences') আর এরর দিবে না
+    const userData = await User.findById(decoded.id).populate('preferences').select("-password");
+    
+    if (!userData) {
+      return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: userData
+    });
 
   } catch (err: any) {
-    console.error('Profile fetch error:', err);
-    return NextResponse.json(
-      { success: false, message: err.message || "Authentication failed" }, 
-      { status: 500 }
-    );
+    console.error("🚩 Profile API Error:", err.message);
+    return NextResponse.json({ 
+      success: false, 
+      message: "Internal Server Error" 
+    }, { status: 500 });
   }
 }
