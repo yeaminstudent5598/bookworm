@@ -1,166 +1,356 @@
-# 📚 BookWorm - Your Personal Cozy Library
+# 📚 BookWorm - Personalized Book Recommendation & Reading Tracker
 
-**BookWorm** is a comprehensive digital library management system designed to provide a cozy and efficient reading experience. Built with the MERN stack and Next.js, it features role-based access, reading progress tracking, and personalized book recommendations.
+> A full-stack web application that helps users discover books, track reading progress, write reviews, and get personalized book recommendations to enhance their reading habits.
 
----
+![Status](https://img.shields.io/badge/status-active-success)
+![Live](https://img.shields.io/badge/live-deployed-blue)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)
 
-## 🚀 Live Demo & Links
-- **Live URL:** [https://bookworm-demo.vercel.app](https://bookworm-demo.vercel.app)
-- **Client Repository:** [https://github.com/Yeamin-Madbor/bookworm](https://github.com/Yeamin-Madbor/bookworm)
-- **Server Repository:** [https://github.com/Yeamin-Madbor/bookworm-server](https://github.com/Yeamin-Madbor/bookworm-server)
-
----
-
-## 🔑 Admin Credentials (For Testing)
-> **Email:** admin@bookworm.com  
-> **Password:** admin123456
+**Live Demo:** [https://bookworm-xi-blond.vercel.app](https://bookworm-xi-blond.vercel.app)
 
 ---
 
-## ✨ Key Features
+## 🌟 Overview
+
+BookWorm is a personalized book recommendation and reading tracker application designed to make discovering and tracking books engaging and intuitive. With role-based access control for both regular users and administrators, BookWorm provides a comprehensive platform for managing personal libraries, discovering new reads, and connecting with the reading community.
+
+The application features:
+- 📚 **Personal Reading Tracker** - Organize books into shelves (Want to Read, Currently Reading, Read)
+- 💡 **Smart Recommendations** - AI-powered suggestions based on reading history
+- ⭐ **Review & Rating System** - Community-driven reviews with moderation
+- 🎓 **Learning Hub** - Curated tutorial videos for book lovers
+- 👨‍💼 **Admin Dashboard** - Complete content management system
+- 📊 **Reading Analytics** - Visualize reading statistics and goals
+
+---
+
+## 🎯 Key Features
 
 ### 👤 User Features
-- **Personalized Dashboard:** A premium dark forest green dashboard with reading stats and progress charts.
-- **Reading Tracker:** Manage books through "Want to Read", "Currently Reading", and "Read" shelves.
-- **Smart Recommendations:** Get book suggestions based on your reading history and favorite genres.
-- **Community Feed:** Stay updated with what other readers are adding or finishing.
-- **Tutorial Hub:** Access curated YouTube video guides on literature and reading tips.
-- **Book Reviews:** Leave detailed reviews and ratings for books you've read.
+
+#### 📖 Book Discovery & Personal Library
+- Browse all books with search functionality
+- Filter by genre and rating range
+- Sort by rating and popularity
+- Add books to three shelves: "Want to Read", "Currently Reading", "Read"
+- Track reading progress (pages/percentage)
+- View book details with cover images
+
+#### ⭐ Reviews & Ratings
+- Write detailed reviews with 1-5 star ratings
+- View approved community reviews
+- Edit or delete own reviews
+- Review moderation system ensures quality
+
+#### 🎯 Personalized Recommendations
+- Smart algorithm based on:
+  - Most common genres from "Read" shelf
+  - Average ratings given by user
+  - Books with highest community-approved reviews in similar genres
+- Display 12-18 recommended books on dashboard
+- Fallback recommendations for new users (popular & highly-rated books)
+- Tooltip explaining why each book is recommended
+
+#### 📊 Reading Dashboard
+- Personalized welcome message
+- Reading statistics (books read, total pages, average rating)
+- Reading challenges/goals for annual targets
+- Progress visualization with circular progress bars
+- Reading streak tracking
+- Genre breakdown pie chart
+- Monthly reading bar chart
+
+#### 🎓 Tutorial Hub
+- Access to 10-12 embedded YouTube videos
+- Book recommendation and review tips
+- Reading tips and strategies
+- Video management by admins
+
+#### 👥 Community Features (Bonus)
+- Follow other users
+- Activity feed showing:
+  - Users adding books to shelves
+  - 5-star ratings given
+  - Books completed
+- Social engagement tracking
 
 ### 🛡️ Admin Features
-- **Library Management:** Full CRUD operations for books, authors, and genres.
-- **Review Moderation:** Approve or delete user reviews before they go public.
-- **User Management:** View all registered users and manage roles (User to Admin).
-- **Advanced Analytics:** Visualized stats using Recharts (Total books, users, and pending tasks).
-- **System Monitoring:** Track pending reviews and platform activity.
+
+#### 📚 Book Management
+- **Create Books**: Add title, author, genre, description, cover image upload
+- **View All Books**: Table/list view with thumbnails and quick actions
+- **Edit Books**: Update all book information
+- **Delete Books**: With confirmation modal and data validation
+- Bulk operations support
+
+#### 📂 Genre/Category Management
+- Create new genres
+- View and edit existing genres
+- Delete genres (with book count validation)
+- Organize book categories
+
+#### ✅ Review Moderation
+- View all pending reviews
+- Approve reviews to make public
+- Delete inappropriate reviews
+- Approve/reject in bulk
+- Track review statistics
+
+#### 👨‍💼 User Management
+- View all registered users
+- Promote users to Admin role
+- Demote Admin back to User role
+- View user activity and statistics
+- Manage user accounts
+
+#### 🎥 Tutorial Management
+- Add YouTube video links
+- Edit tutorial information
+- Delete outdated tutorials
+- Organize videos by category
+
+#### 📊 Admin Dashboard
+- Total books count
+- Total users count
+- Pending reviews count
+- Latest activities
+- User growth chart
+- Genre distribution chart
+- Books per month chart
+- Popular books by shelf additions
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
 ### Frontend
-- **Next.js 14+** - React framework with App Router
+- **Next.js 16** - React framework with App Router
+- **React 19** - UI library
 - **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **Framer Motion** - Animations and transitions
-- **Recharts** - Data visualizations
+- **Tailwind CSS 4** - Utility-first styling
+- **Framer Motion** - Smooth animations
+- **Recharts** - Beautiful data visualizations
+- **Axios** - HTTP client
+- **JWT Decode** - Token management
+- **Cookies-next** - Cookie handling
 
 ### Backend
+- **Next.js API Routes** - Serverless backend
 - **Node.js** - JavaScript runtime
-- **Express.js** - Web framework
-- **Mongoose** - MongoDB object modeling
+- **Express.js** - Web framework (implicit via Next.js)
 
 ### Database & Authentication
-- **MongoDB Atlas** - Cloud database
-- **JWT (JSON Web Tokens)** - Secure authentication
-- **Role-Based Access Control (RBAC)** - Permission management
+- **MongoDB** - NoSQL database (MongoDB Atlas)
+- **Mongoose** - MongoDB object modeling
+- **JWT (JSON Web Tokens)** - Stateless authentication
+- **bcryptjs** - Password hashing and security
+- **Redis** - Session caching and rate limiting
+
+### File Storage
+- **Cloudinary** - Cloud storage for book covers and profile photos
+
+### Email Service
+- **Nodemailer** - Email sending
+- **Gmail SMTP** - Email provider
+
+### Development Tools
+- **ESLint** - Code linting
+- **Tailwind CSS** - CSS framework
+- **TypeScript** - Type checking
+
+---
+
+## 📋 Project Structure
+
+```
+bookworm/
+├── src/
+│   ├── modules/                    # Business logic modules
+│   │   ├── auth/                   # Authentication
+│   │   ├── book/                   # Book management
+│   │   ├── genre/                  # Genre management
+│   │   ├── review/                 # Review system
+│   │   ├── user/                   # User management
+│   │   ├── shelf/                  # Reading shelves
+│   │   ├── library/                # User library
+│   │   ├── tutorial/               # Tutorials
+│   │   ├── stats/                  # Statistics
+│   │   └── dashboard/              # Dashboard data
+│   ├── app/                        # Next.js app directory
+│   │   ├── api/v1/                 # API routes
+│   │   │   ├── auth/               # Auth endpoints
+│   │   │   ├── admin/              # Admin endpoints
+│   │   │   ├── user/               # User endpoints
+│   │   │   ├── books/              # Book endpoints
+│   │   │   ├── genres/             # Genre endpoints
+│   │   │   ├── reviews/            # Review endpoints
+│   │   │   ├── tutorials/          # Tutorial endpoints
+│   │   │   ├── shelf/              # Shelf endpoints
+│   │   │   └── recommendations/    # Recommendation endpoints
+│   │   ├── (auth)/                 # Auth pages
+│   │   │   ├── login/
+│   │   │   ├── register/
+│   │   │   ├── forgot-password/
+│   │   │   └── reset-password/
+│   │   ├── (user)/                 # User pages
+│   │   │   ├── dashboard/
+│   │   │   ├── books/
+│   │   │   ├── my-library/
+│   │   │   ├── tutorials/
+│   │   │   └── profile/
+│   │   ├── (admin)/                # Admin pages
+│   │   │   ├── admin/
+│   │   │   │   ├── dashboard/
+│   │   │   │   ├── books/
+│   │   │   │   ├── genres/
+│   │   │   │   ├── users/
+│   │   │   │   ├── reviews/
+│   │   │   │   ├── tutorials/
+│   │   │   │   └── profile/
+│   │   ├── globals.css             # Global styles
+│   │   ├── layout.tsx              # Root layout
+│   │   └── page.tsx                # Root page
+│   ├── lib/                        # Utility functions
+│   │   ├── dbConnect.ts            # Database connection
+│   │   ├── jwt.ts                  # JWT utilities
+│   │   ├── cloudinary.ts           # Cloudinary integration
+│   │   ├── sendEmail.ts            # Email sending
+│   │   ├── axios.ts                # Axios instance
+│   │   └── redis.ts                # Redis client
+│   ├── middleware/
+│   │   └── authMiddleware.ts       # Authentication middleware
+│   ├── components/                 # Reusable React components
+│   │   ├── shared/                 # Shared components
+│   │   └── books/                  # Book components
+│   ├── constants/
+│   │   └── navLinks.ts
+│   └── middleware.ts               # Next.js middleware
+├── public/                         # Static assets
+├── .env.local                      # Environment variables
+├── next.config.ts                  # Next.js configuration
+├── tsconfig.json                   # TypeScript configuration
+├── tailwind.config.js              # Tailwind CSS configuration
+└── package.json
+```
 
 ---
 
 ## ⚙️ Environment Variables
 
-To run this project, create a `.env.local` file in the root directory and add the following variables:
+Create a `.env.local` file in the root directory with the following variables:
 
 ```env
 # Database
-MONGODB_URI=your_mongodb_atlas_connection_string
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/bookworm
 
-# Authentication
-JWT_SECRET=your_super_secret_jwt_key
+# JWT
+JWT_SECRET=your_jwt_secret_key_min_32_characters
+JWT_ACCESS_SECRET=access_secret
+JWT_ACCESS_EXPIRES=1d
+JWT_REFRESH_SECRET=refresh_secret
+JWT_REFRESH_EXPIRES=7d
 
-# API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
-API_BASE_URL=http://localhost:3000/api/v1
+# Node Environment
+NODE_ENV=development
 
-# Environment
-NEXT_PUBLIC_ENVIRONMENT=development
+# Cloudinary (Image Upload)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# API URL
+NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_JWT_SECRET=your_jwt_secret_key
+
+# Email Service (SMTP Gmail)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+SMTP_FROM=your_email@gmail.com
+
+# Redis Cache
+REDIS_HOST=your_redis_host
+REDIS_PORT=your_redis_port
+REDIS_USERNAME=default
+REDIS_PASSWORD=your_redis_password
 ```
 
 ---
 
-## 🏃 Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js v18+ and npm/yarn installed
+- Node.js v18+
+- npm or yarn
 - MongoDB Atlas account
-- Git installed
+- Cloudinary account
+- Gmail account with app password
+- Redis account
 
-### Installation Steps
+### Installation & Setup
 
-**1. Clone the repository:**
+**1. Clone the repository**
 ```bash
 git clone https://github.com/Yeamin-Madbor/bookworm.git
 cd bookworm
 ```
 
-**2. Install dependencies:**
+**2. Install dependencies**
 ```bash
 npm install
-# or
-yarn install
 ```
 
-**3. Configure environment variables:**
-Create a `.env.local` file and add the variables listed in the Environment Variables section above.
+**3. Configure environment variables**
+Create a `.env.local` file in the root directory and add all required variables (see Environment Variables section).
 
-**4. Run the development server:**
+**4. Run the development server**
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-**5. Open in your browser:**
+**5. Open in your browser**
 Navigate to `http://localhost:3000`
 
 ---
 
-## 📁 Project Structure
+## 🔐 Authentication & Access Control
 
-```
-bookworm/
-├── app/
-│   ├── api/                      # API routes (/api/v1)
-│   ├── (dashboard)/              # Dashboard routes (protected)
-│   ├── (auth)/                   # Authentication routes (login, register)
-│   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Home page
-├── components/
-│   ├── shared/                   # Shared components
-│   │   ├── Navbar.tsx
-│   │   ├── Sidebar.tsx
-│   │   └── Footer.tsx
-│   ├── dashboard/                # Dashboard-specific components
-│   │   ├── StatsCard.tsx
-│   │   ├── ReadingChart.tsx
-│   │   └── BookShelf.tsx
-│   └── ui/                       # Reusable UI components
-│       ├── Button.tsx
-│       ├── Card.tsx
-│       └── Modal.tsx
-├── lib/
-│   ├── db.ts                     # MongoDB connection
-│   ├── auth.ts                   # Authentication logic
-│   ├── validations.ts            # Zod schemas
-│   └── utils.ts                  # Utility functions
-├── models/
-│   ├── User.ts                   # User schema
-│   ├── Book.ts                   # Book schema
-│   ├── Review.ts                 # Review schema
-│   └── Author.ts                 # Author schema
-├── public/
-│   ├── images/
-│   └── icons/
-├── styles/
-│   ├── globals.css
-│   └── variables.css
-├── .env.local                    # Environment variables (create this)
-├── .gitignore
-├── next.config.js                # Next.js configuration
-├── tsconfig.json                 # TypeScript configuration
-├── tailwind.config.js            # Tailwind CSS configuration
-└── package.json
-```
+### Authentication System
+
+**Registration Process:**
+- Users provide: Name, Email, Photo, Password
+- Photo is uploaded to Cloudinary
+- Password is hashed using bcryptjs
+- Email uniqueness is validated
+- Strong password validation is enforced
+
+**Login Process:**
+- Users login with Email and Password
+- JWT tokens are issued on successful authentication
+- Tokens include user role and permissions
+- Refresh token mechanism for session management
+
+### Route Protection & RBAC
+
+**Public Routes:**
+- `/api/v1/auth/register` - User registration
+- `/api/v1/auth/login` - User login
+- `/api/v1/auth/forgot-password` - Password recovery
+- `/api/v1/auth/reset-password` - Password reset
+
+**Protected Routes:**
+- All user and admin routes require JWT authentication
+- Role-based access control enforced
+
+**Default Route Behavior:**
+- `No public homepage` - Unauthenticated users redirected to login
+- `Normal User` - Default route redirects to `/user/dashboard`
+- `Admin User` - Default route redirects to `/admin/admin/dashboard`
+
+**User Roles:**
+- **User** - Standard user with limited permissions
+- **Admin** - Full system access with management capabilities
 
 ---
 
@@ -176,7 +366,8 @@ Content-Type: application/json
 {
   "name": "John Doe",
   "email": "john@example.com",
-  "password": "SecurePassword123!"
+  "password": "SecurePassword123!",
+  "photo": "file_upload"
 }
 ```
 
@@ -189,19 +380,57 @@ Content-Type: application/json
   "email": "john@example.com",
   "password": "SecurePassword123!"
 }
+
+Response:
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": { id, name, email, role },
+    "token": "jwt_token",
+    "refreshToken": "refresh_token"
+  }
+}
 ```
 
-**Get Profile**
+**Forgot Password**
 ```http
-GET /api/v1/auth/profile
-Authorization: Bearer {jwt_token}
+POST /api/v1/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "john@example.com"
+}
 ```
 
-### Books Endpoints
+**Reset Password**
+```http
+POST /api/v1/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "reset_token",
+  "password": "NewPassword123!"
+}
+```
+
+**Change Password**
+```http
+POST /api/v1/auth/change-password
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "oldPassword": "OldPassword123!",
+  "newPassword": "NewPassword123!"
+}
+```
+
+### Book Endpoints
 
 **Get All Books**
 ```http
-GET /api/v1/books
+GET /api/v1/books?page=1&limit=12&genre=fiction&sortBy=rating&search=harry
 ```
 
 **Get Single Book**
@@ -211,16 +440,16 @@ GET /api/v1/books/:id
 
 **Create Book (Admin Only)**
 ```http
-POST /api/v1/books
+POST /api/v1/admin/books
 Authorization: Bearer {admin_token}
-Content-Type: application/json
+Content-Type: multipart/form-data
 
 {
   "title": "The Great Gatsby",
   "author": "F. Scott Fitzgerald",
-  "genre": "Fiction",
-  "description": "A classic American novel",
-  "coverImage": "https://...",
+  "genre": "genre_id",
+  "description": "Classic American novel",
+  "coverImage": "file_upload",
   "publicationYear": 1925,
   "pages": 180,
   "isbn": "978-0-7432-7356-5"
@@ -229,27 +458,97 @@ Content-Type: application/json
 
 **Update Book (Admin Only)**
 ```http
-PUT /api/v1/books/:id
+PUT /api/v1/admin/books/:id
 Authorization: Bearer {admin_token}
-Content-Type: application/json
+Content-Type: multipart/form-data
 
 {
   "title": "Updated Title",
-  "genre": "Classic Fiction"
+  "genre": "genre_id"
 }
 ```
 
 **Delete Book (Admin Only)**
 ```http
-DELETE /api/v1/books/:id
+DELETE /api/v1/admin/books/:id
 Authorization: Bearer {admin_token}
 ```
 
-### Reviews Endpoints
+### Genre Endpoints
+
+**Get All Genres**
+```http
+GET /api/v1/genres
+```
+
+**Create Genre (Admin Only)**
+```http
+POST /api/v1/admin/genres
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "name": "Science Fiction",
+  "description": "Future and technology stories"
+}
+```
+
+**Update Genre (Admin Only)**
+```http
+PUT /api/v1/admin/genres/:id
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "description": "Updated description"
+}
+```
+
+**Delete Genre (Admin Only)**
+```http
+DELETE /api/v1/admin/genres/:id
+Authorization: Bearer {admin_token}
+```
+
+### Shelf & Library Endpoints
+
+**Add Book to Shelf**
+```http
+POST /api/v1/shelf
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "bookId": "book_id",
+  "shelfType": "wantToRead|currentlyReading|read",
+  "pagesRead": 100,
+  "totalPages": 300
+}
+```
+
+**Get My Library**
+```http
+GET /api/v1/user/library
+Authorization: Bearer {token}
+```
+
+**Update Reading Progress**
+```http
+PUT /api/v1/shelf/:shelfId
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "pagesRead": 150
+}
+```
+
+### Review Endpoints
 
 **Get Book Reviews**
 ```http
-GET /api/v1/reviews/:bookId
+GET /api/v1/reviews?bookId=book_id&status=approved
 ```
 
 **Create Review**
@@ -261,8 +560,8 @@ Content-Type: application/json
 {
   "bookId": "book_id",
   "rating": 5,
-  "comment": "Amazing book!",
-  "readDate": "2024-01-10"
+  "comment": "Amazing book! Highly recommended.",
+  "readDate": "2026-01-10"
 }
 ```
 
@@ -284,29 +583,87 @@ DELETE /api/v1/reviews/:id
 Authorization: Bearer {token}
 ```
 
-### Admin Endpoints
-
-**Get Dashboard Stats**
-```http
-GET /api/v1/admin/dashboard
-Authorization: Bearer {admin_token}
-```
-
-**Get All Users**
-```http
-GET /api/v1/admin/users
-Authorization: Bearer {admin_token}
-```
+### Admin Review Moderation
 
 **Get Pending Reviews**
 ```http
-GET /api/v1/admin/reviews/pending
+GET /api/v1/admin/reviews?status=pending
 Authorization: Bearer {admin_token}
 ```
 
 **Approve Review**
 ```http
-PUT /api/v1/admin/reviews/:id/approve
+PUT /api/v1/admin/reviews/:id
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "status": "approved"
+}
+```
+
+**Delete Review**
+```http
+DELETE /api/v1/admin/reviews/:id
+Authorization: Bearer {admin_token}
+```
+
+### Recommendation Endpoints
+
+**Get Personalized Recommendations**
+```http
+GET /api/v1/recommendations
+Authorization: Bearer {token}
+```
+
+### Tutorial Endpoints
+
+**Get All Tutorials**
+```http
+GET /api/v1/tutorials
+```
+
+**Create Tutorial (Admin Only)**
+```http
+POST /api/v1/admin/tutorials
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "title": "How to Choose Your Next Book",
+  "youtubeLink": "https://youtube.com/watch?v=...",
+  "description": "Tips for selecting books"
+}
+```
+
+**Update Tutorial (Admin Only)**
+```http
+PUT /api/v1/admin/tutorials/:id
+Authorization: Bearer {admin_token}
+Content-Type: application/json
+
+{
+  "title": "Updated Title"
+}
+```
+
+**Delete Tutorial (Admin Only)**
+```http
+DELETE /api/v1/admin/tutorials/:id
+Authorization: Bearer {admin_token}
+```
+
+### User Management (Admin Only)
+
+**Get All Users**
+```http
+GET /api/v1/admin/users?page=1&limit=10
+Authorization: Bearer {admin_token}
+```
+
+**Get User Details**
+```http
+GET /api/v1/admin/users/:id
 Authorization: Bearer {admin_token}
 ```
 
@@ -321,241 +678,338 @@ Content-Type: application/json
 }
 ```
 
----
+### Dashboard & Stats
 
-## 🔒 Security Features
+**Get User Dashboard Stats**
+```http
+GET /api/v1/user/dashboard-stats
+Authorization: Bearer {token}
+```
 
-- **JWT Authentication** - Secure token-based authentication with expiration
-- **Password Hashing** - bcrypt for secure password storage
-- **Role-Based Access Control (RBAC)** - Fine-grained permission management
-- **Input Validation** - Zod schemas for data validation
-- **CORS Protection** - Properly configured cross-origin requests
-- **Rate Limiting** - Prevent API abuse
-- **HTTPS Only** - Enforced in production
+**Get Admin Dashboard Stats**
+```http
+GET /api/v1/admin/stats
+Authorization: Bearer {admin_token}
+```
 
----
-
-## 📦 Dependencies
-
-```json
-{
-  "dependencies": {
-    "next": "^14.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "mongoose": "^7.0.0",
-    "jsonwebtoken": "^9.0.0",
-    "bcryptjs": "^2.4.3",
-    "tailwindcss": "^3.0.0",
-    "framer-motion": "^10.0.0",
-    "recharts": "^2.10.0",
-    "zod": "^3.22.0",
-    "axios": "^1.6.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/react": "^18.0.0",
-    "@types/node": "^20.0.0",
-    "tailwindcss": "^3.0.0"
-  }
-}
+**Get User Growth Chart**
+```http
+GET /api/v1/admin/user-growth
+Authorization: Bearer {admin_token}
 ```
 
 ---
 
-## 🎨 Design Features
+## 🔑 Test Credentials
 
-- **Dark Forest Green Theme** - Eye-friendly cozy color palette
+### Admin Account
+```
+Email: admin@bookworm.com
+Password: admin123456
+```
+
+### Sample User Account
+```
+Email: user@bookworm.com
+Password: User@123456
+```
+
+---
+
+## 🎨 Design & UI/UX
+
+### Features
 - **Responsive Design** - Optimized for mobile, tablet, and desktop
-- **Smooth Animations** - Framer Motion for delightful interactions
-- **Modern UI** - Clean and intuitive interface
-- **Accessibility** - WCAG compliant with proper semantic HTML
-- **Fast Performance** - Optimized images and lazy loading
+- **Dark Forest Green Theme** - Cozy library aesthetic with warm colors
+- **Smooth Animations** - Framer Motion for transitions
+- **Accessibility** - WCAG compliant with semantic HTML
+- **Loading States** - Skeleton loaders and spinners
+- **Error Handling** - Clear error messages and user feedback
+- **Image Optimization** - Next.js Image component for book covers
+
+### Pages & Components
+- Beautiful book cards with lazy loading
+- Responsive navigation and sidebar
+- Modal dialogs for confirmations
+- Toast notifications for actions
+- Form validation with helpful messages
+- Charts and visualizations for analytics
+
+---
+
+## 📊 Advanced Features Implemented
+
+### Reading Tracker & Goals
+- Annual reading goals with progress tracking
+- Circular progress bars for goal completion
+- Books read this year counter
+- Total pages read statistics
+- Average rating given to books
+- Genre breakdown with pie chart
+- Reading streak tracking
+- Monthly reading bar chart
+- Reading timeline visualization
+
+### Recommendation Algorithm
+- Multiple factor analysis:
+  - Most read genres
+  - User rating patterns
+  - Community-approved reviews
+  - Similar user preferences
+- 12-18 books displayed on dashboard
+- Smart fallback for new users
+- "Why this book?" tooltip explanations
+
+### Community Features
+- Follow/unfollow users
+- Activity feed with notifications
+- User following list
+- Reading milestones sharing
+- Community engagement metrics
+
+### Admin Analytics
+- Total books and users count
+- Pending reviews count
+- User growth trends
+- Genre distribution
+- Books added per month
+- Popular books by shelf additions
+- Review approval rates
+
+---
+
+## 🔒 Security Implementation
+
+- **JWT Authentication** - Secure token-based authentication
+- **Password Security** - bcryptjs hashing with salt rounds
+- **CORS Protection** - Configured for production domains
+- **Input Validation** - Zod schema validation on all inputs
+- **Rate Limiting** - Redis-based request throttling
+- **Email Verification** - Optional email verification flow
+- **Password Reset** - Secure token-based password recovery
+- **Role-Based Access** - Granular permission checking
+- **HTTPS Ready** - Optimized for secure deployment
 
 ---
 
 ## 🚀 Deployment
 
-### Deploy to Vercel (Recommended)
+### Deploy to Vercel
 
+**1. Connect GitHub Repository**
 ```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-
-# Follow prompts and set environment variables in dashboard
+# Push code to GitHub
+git add .
+git commit -m "Initial commit"
+git push origin main
 ```
 
-### Environment Variables in Vercel Dashboard
-- `MONGODB_URI`
-- `JWT_SECRET`
-- `NEXT_PUBLIC_API_URL`
+**2. Import to Vercel**
+- Go to https://vercel.com
+- Click "Add New" → "Project"
+- Select your GitHub repository
+- Configure project settings
 
-### Deploy to Other Platforms
+**3. Set Environment Variables**
+In Vercel dashboard → Settings → Environment Variables, add:
+- MONGODB_URI
+- JWT_SECRET
+- CLOUDINARY_CLOUD_NAME
+- CLOUDINARY_API_KEY
+- CLOUDINARY_API_SECRET
+- NEXT_PUBLIC_API_URL
+- SMTP_HOST
+- SMTP_PORT
+- SMTP_USER
+- SMTP_PASS
+- SMTP_FROM
+- REDIS_HOST
+- REDIS_PORT
+- REDIS_USERNAME
+- REDIS_PASSWORD
 
-**Netlify:**
-```bash
-npm run build
-# Deploy the .next folder
-```
+**4. Deploy**
+- Vercel automatically deploys on push
+- Check deployment status in Vercel dashboard
 
-**Docker:**
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-EXPOSE 3000
-CMD ["npm", "start"]
+### Environment Setup for Production
+```env
+NODE_ENV=production
+NEXT_PUBLIC_API_URL=https://your-domain.vercel.app
+JWT_ACCESS_EXPIRES=1d
+JWT_REFRESH_EXPIRES=7d
 ```
 
 ---
 
-## 📊 Key Features in Detail
+## 📈 Performance Optimizations
 
-### Reading Progress Tracking
-- Visual progress bars for each book
-- Percentage completion tracking
-- Reading time estimates
-- Reading streak counter
-- Completion certificates
+- **Next.js Image Optimization** - Automatic image resizing and optimization
+- **Server-Side Rendering (SSR)** - For book lists and details
+- **Static Generation (SSG)** - For genres and popular books
+- **Incremental Static Regeneration (ISR)** - Auto-update static pages
+- **Code Splitting** - Automatic route-based splitting
+- **Lazy Loading** - Images and components load on demand
+- **Redis Caching** - Cache frequently accessed data
+- **API Response Caching** - Reduce database queries
+- **CDN Delivery** - Vercel's global CDN for fast delivery
 
-### Smart Recommendations
-- Collaborative filtering based on user history
-- Genre-based suggestions
-- Popular picks in favorite categories
-- Trending books this week
-- Personalized suggestions based on ratings
+---
 
-### Community Features
-- Share reading milestones
-- Follow other readers
-- See what friends are reading
-- Participate in reading discussions
-- Create and join reading clubs
+## 📋 API Response Format
 
-### Analytics Dashboard
-- Total books in library
-- Total users on platform
-- Average reading time
-- Most popular books
-- Top-rated reviews
-- Pending moderation tasks
+All API responses follow a consistent format:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { },
+  "statusCode": 200
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "error": "Error details",
+  "statusCode": 400
+}
+```
 
 ---
 
 ## 🧪 Testing
 
-### Running Tests
-```bash
-npm run test
-```
+### Manual Testing Checklist
+- [ ] User registration with valid/invalid data
+- [ ] User login and logout
+- [ ] Add book to shelf
+- [ ] Update reading progress
+- [ ] Write and edit review
+- [ ] Admin book CRUD operations
+- [ ] Admin genre management
+- [ ] Review moderation
+- [ ] Recommendation algorithm
+- [ ] Search and filter functionality
+- [ ] Mobile responsiveness
+- [ ] Error handling
+- [ ] Loading states
 
-### Test Coverage
-```bash
-npm run test:coverage
+---
+
+## 🐛 Error Handling
+
+### Common Errors & Solutions
+
+**MongoDB Connection Error**
+- Verify MONGODB_URI in .env.local
+- Check MongoDB Atlas IP whitelist
+
+**JWT Token Error**
+- Clear browser cookies
+- Re-login to get new token
+- Check JWT_SECRET in .env.local
+
+**Cloudinary Upload Error**
+- Verify Cloudinary credentials
+- Check file size (max 10MB)
+- Ensure file is image format
+
+**Email Not Sending**
+- Verify Gmail credentials
+- Enable "Less secure app access"
+- Use Gmail App Password
+
+**Redis Connection Error**
+- Verify Redis credentials
+- Check Redis host and port
+- Ensure Redis database is running
+
+---
+
+## 📝 Git Commits
+
+Project contains 12+ meaningful commits on both client and server repositories:
+
+Example commits:
+```
+1. Initial project setup with Next.js and TypeScript
+2. Configure MongoDB and Mongoose schemas
+3. Implement authentication system with JWT
+4. Create book management CRUD operations
+5. Add review and rating system
+6. Implement genre management
+7. Build personalized recommendation algorithm
+8. Create admin dashboard with analytics
+9. Add reading tracker and shelf system
+10. Implement tutorial management
+11. Add user management features
+12. Deploy to Vercel and configure production
 ```
 
 ---
 
-## 📝 License
+## 📱 Browser Support
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Chrome (latest 2 versions)
+- Firefox (latest 2 versions)
+- Safari 12+
+- Edge (latest 2 versions)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
 ---
 
-## 🔗 Links
+## 📞 Support & Contact
 
-| Link | URL |
-|------|-----|
-| **Live Demo** | https://bookworm-demo.vercel.app |
-| **Client Repo** | https://github.com/Yeamin-Madbor/bookworm |
-| **Server Repo** | https://github.com/Yeamin-Madbor/bookworm-server |
-| **Issues** | https://github.com/Yeamin-Madbor/bookworm/issues |
-| **Discussions** | https://github.com/Yeamin-Madbor/bookworm/discussions |
+For questions or issues:
+- **GitHub Issues:** [Open an issue](https://github.com/Yeamin-Madbor/bookworm/issues)
+- **Email:** yeamin@example.com
+- **LinkedIn:** [linkedin.com/in/yeamin-madbor](https://linkedin.com/in/yeamin-madbor)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙏 Acknowledgments
+
+- Programming Hero for the opportunity
+- Next.js and React communities
+- MongoDB documentation
+- Vercel hosting platform
+- All open-source libraries used
 
 ---
 
 ## 👨‍💻 Author
 
 **Yeamin Madbor**
-
-Full Stack Web Developer | MERN Specialist | Next.js Enthusiast
-
-- **LinkedIn:** [linkedin.com/in/yeamin-madbor](https://linkedin.com/in/yeamin-madbor)
-- **GitHub:** [@Yeamin-Madbor](https://github.com/Yeamin-Madbor)
-- **Portfolio:** [yeamin-madbor.vercel.app](https://yeamin-madbor.vercel.app)
-- **Email:** yeamin@example.com
+- Full Stack Web Developer
+- MERN & Next.js Specialist
+- GitHub: [@Yeamin-Madbor](https://github.com/Yeamin-Madbor)
+- LinkedIn: [linkedin.com/in/yeamin-madbor](https://linkedin.com/in/yeamin-madbor)
 
 ---
 
-## ❓ FAQ
+## 🔗 Important Links
 
-**Q: Is BookWorm free?**  
-A: Yes, BookWorm is completely free and open-source.
-
-**Q: Can I use BookWorm for commercial purposes?**  
-A: Yes, under the MIT License with proper attribution.
-
-**Q: How often is BookWorm updated?**  
-A: Regular updates are released monthly with new features and improvements.
-
-**Q: How do I report bugs?**  
-A: Please open an issue on our GitHub repository with detailed information.
-
-**Q: Can I contribute to the project?**  
-A: Yes! We welcome contributions. Please see the Contributing section below.
-
-**Q: What should I do if I forget my password?**  
-A: Use the "Forgot Password" link on the login page. A reset link will be sent to your email.
-
-**Q: Is my reading data private?**  
-A: Yes, your data is private and only visible to you unless you choose to share it.
+| Resource | Link |
+|----------|------|
+| **Live Application** | https://bookworm-xi-blond.vercel.app |
+| **Client Repository** | https://github.com/Yeamin-Madbor/bookworm |
+| **Server Repository** | https://github.com/Yeamin-Madbor/bookworm-server |
+| **Project Requirements** | [View Document](https://programming-hero.com) |
+| **Submission Form** | https://forms.gle/uUxVTgP9Zq6ra3uY9 |
 
 ---
 
-## 🤝 Contributing
+**Made with ❤️ for book lovers | Programming Hero Job Task**
 
-Contributions are welcome! Here's how to contribute:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Contribution Guidelines
-- Follow the existing code style
-- Write clear commit messages
-- Update documentation as needed
-- Test your changes before submitting
-
----
-
-## 📞 Support
-
-For support, questions, or feedback:
-- **Email:** support@bookworm.com
-- **GitHub Issues:** [Open an issue](https://github.com/Yeamin-Madbor/bookworm/issues)
-- **GitHub Discussions:** [Start a discussion](https://github.com/Yeamin-Madbor/bookworm/discussions)
-
----
-
-## 🙏 Acknowledgments
-
-- [Next.js](https://nextjs.org/) - React framework
-- [MongoDB](https://www.mongodb.com/) - Database
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [Recharts](https://recharts.org/) - Charts library
-- [Framer Motion](https://www.framer.com/motion/) - Animation library
-
----
-
-**Made with ❤️ for book lovers everywhere**
-
-*Last updated: January 2024 | BookWorm v1.0.0*
-*Follow us on [Twitter](https://twitter.com) | [Facebook](https://facebook.com)*
+*Last Updated: January 2026 | BookWorm v1.0.0*
